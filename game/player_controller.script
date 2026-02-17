@@ -23,6 +23,8 @@ local TURN_SPEED = math.rad(160.0)
 local JUMP_SPEED = 10.5
 local GRAVITY = -28.0
 local GROUND_NORMAL_Y = 0.6
+local FALL_RESPAWN_Y = -10.0
+local RESPAWN_POSITION = vmath.vector3(0.0, 2.0, 0.0)
 
 local function update_boolean_action(action, current_value)
 	if action.pressed then
@@ -97,6 +99,14 @@ function update(self, dt)
 
 	local position = go.get_position()
 	position = position + self.velocity * dt
+
+	if position.y <= FALL_RESPAWN_Y then
+		position = vmath.vector3(RESPAWN_POSITION)
+		self.velocity = vmath.vector3()
+		self.grounded = false
+		self.jump_queued = false
+	end
+
 	go.set_position(position)
 	go.set_rotation(vmath.quat_rotation_y(self.yaw))
 end
