@@ -1,0 +1,36 @@
+key_trigger {
+  input: KEY_SPACE
+  action: "jump"
+}
+key_trigger {
+  input: KEY_W
+  action: "run_forward"
+}
+key_trigger {
+  input: KEY_S
+  action: "run_backward"
+}
+key_trigger {
+  input: KEY_A
+  action: "turn_left"
+}
+key_trigger {
+  input: KEY_D
+  action: "turn_right"
+}
+key_trigger {
+  input: KEY_UP
+  action: "run_forward"
+}
+key_trigger {
+  input: KEY_DOWN
+  action: "run_backward"
+}
+key_trigger {
+  input: KEY_LEFT
+  action: "turn_left"
+}
+key_trigger {
+  input: KEY_RIGHT
+  action: "turn_right"
+}

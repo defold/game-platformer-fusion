@@ -1,3 +1,7 @@
+components {
+  id: "controller"
+  component: "/game/player_controller.script"
+}
 embedded_components {
   id: "model"
   type: "model"
@@ -13,6 +17,32 @@ embedded_components {
   "    sampler: \"tex0\"\n"
   "    texture: \"/assets/models/characters/Textures/colormap.png\"\n"
   "  }\n"
+  "}\n"
+  ""
+}
+embedded_components {
+  id: "collisionobject"
+  type: "collisionobject"
+  data: "type: COLLISION_OBJECT_TYPE_KINEMATIC\n"
+  "mass: 0.0\n"
+  "friction: 0.0\n"
+  "restitution: 0.0\n"
+  "group: \"player\"\n"
+  "mask: \"platform\"\n"
+  "embedded_collision_shape {\n"
+  "  shapes {\n"
+  "    shape_type: TYPE_BOX\n"
+  "    position {\n"
+  "      y: 0.9\n"
+  "    }\n"
+  "    rotation {\n"
+  "    }\n"
+  "    index: 0\n"
+  "    count: 3\n"
+  "  }\n"
+  "  data: 0.35\n"
+  "  data: 0.9\n"
+  "  data: 0.35\n"
   "}\n"
   ""
 }
