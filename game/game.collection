@@ -1,0 +1,48 @@
+name: "gltf"
+instances {
+  id: "player"
+  prototype: "/game/player.go"
+  position {
+    y: 1.0
+  }
+}
+instances {
+  id: "platform_2x2x1_green"
+  prototype: "/assets/models/green/platform_2x2x1_green.go"
+  position {
+    x: 3.0
+  }
+}
+instances {
+  id: "platform_1x1x1_green"
+  prototype: "/assets/models/green/platform_1x1x1_green.go"
+}
+scale_along_z: 1
+embedded_instances {
+  id: "camera"
+  data: "embedded_components {\n"
+  "  id: \"camera\"\n"
+  "  type: \"camera\"\n"
+  "  data: \"aspect_ratio: 1.0\\n"
+  "fov: 0.7854\\n"
+  "near_z: 0.1\\n"
+  "far_z: 1000.0\\n"
+  "auto_aspect_ratio: 1\\n"
+  "\"\n"
+  "}\n"
+  ""
+  position {
+    y: 2.0
+    z: 5.0
+  }
+  rotation {
+    x: -0.16560513
+    w: 0.98619217
+  }
+}
+embedded_instances {
+  id: "level"
+  children: "platform_1x1x1_green"
+  children: "platform_2x2x1_green"
+  data: ""
+}

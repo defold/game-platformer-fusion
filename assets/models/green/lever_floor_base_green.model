@@ -1,0 +1,10 @@
+mesh: "/assets/models/green/lever_floor_base_green.gltf"
+name: "leverfloorbase"
+materials {
+  name: "platformer"
+  material: "/assets/materials/level.material"
+  textures {
+    sampler: "tex0"
+    texture: "/assets/models/green/platformer_texture.png"
+  }
+}

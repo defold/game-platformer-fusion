@@ -1,0 +1,10 @@
+mesh: "/assets/models/green/pipe_straight_A_green.gltf"
+name: "pipestraightA"
+materials {
+  name: "platformer"
+  material: "/assets/materials/level.material"
+  textures {
+    sampler: "tex0"
+    texture: "/assets/models/green/platformer_texture.png"
+  }
+}

@@ -1,0 +1,18 @@
+embedded_components {
+  id: "model"
+  type: "model"
+  data: "mesh: \"/assets/models/characters/character-female-a.glb\"\n"
+  "skeleton: \"/assets/models/characters/character-female-a.glb\"\n"
+  "animations: \"/assets/models/characters/character-female-a.glb\"\n"
+  "default_animation: \"idle\"\n"
+  "name: \"{{NAME}}\"\n"
+  "materials {\n"
+  "  name: \"colormap\"\n"
+  "  material: \"/assets/materials/player.material\"\n"
+  "  textures {\n"
+  "    sampler: \"tex0\"\n"
+  "    texture: \"/assets/models/characters/Textures/colormap.png\"\n"
+  "  }\n"
+  "}\n"
+  ""
+}

@@ -1,0 +1,10 @@
+mesh: "/assets/models/green/railing_straight_double_green.gltf"
+name: "railingstraightdouble"
+materials {
+  name: "platformer"
+  material: "/assets/materials/level.material"
+  textures {
+    sampler: "tex0"
+    texture: "/assets/models/green/platformer_texture.png"
+  }
+}

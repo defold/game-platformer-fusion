@@ -1,0 +1,10 @@
+mesh: "/assets/models/green/signage_arrow_stand_green.gltf"
+name: "signagearrowstand"
+materials {
+  name: "platformer"
+  material: "/assets/materials/level.material"
+  textures {
+    sampler: "tex0"
+    texture: "/assets/models/green/platformer_texture.png"
+  }
+}

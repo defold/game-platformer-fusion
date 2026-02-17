@@ -1,0 +1,24 @@
+#version 140
+
+out mediump vec2 var_texcoord0;
+out mediump vec4 var_face_color;
+out mediump vec4 var_outline_color;
+
+// positions are in world space
+in mediump vec4 position;
+in mediump vec2 texcoord0;
+in mediump vec4 face_color;
+in mediump vec4 outline_color;
+in mediump vec4 shadow_color;
+
+uniform vs_uniforms
+{
+    mat4 view_proj;
+};
+
+void main()
+{
+    var_texcoord0 = texcoord0;
+    var_face_color = face_color;
+    gl_Position = view_proj * vec4(position.x, position.y, position.z, 1.0);
+}

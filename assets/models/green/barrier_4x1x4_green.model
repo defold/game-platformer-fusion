@@ -1,0 +1,10 @@
+mesh: "/assets/models/green/barrier_4x1x4_green.gltf"
+name: "barrier4x1x4"
+materials {
+  name: "platformer"
+  material: "/assets/materials/level.material"
+  textures {
+    sampler: "tex0"
+    texture: "/assets/models/green/platformer_texture.png"
+  }
+}

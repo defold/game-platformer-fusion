@@ -1,0 +1,10 @@
+mesh: "/assets/models/green/platform_arrow_2x2x1_green.gltf"
+name: "platformarrow2x2x1"
+materials {
+  name: "platformer"
+  material: "/assets/materials/level.material"
+  textures {
+    sampler: "tex0"
+    texture: "/assets/models/green/platformer_texture.png"
+  }
+}

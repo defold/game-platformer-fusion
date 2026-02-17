@@ -1,0 +1,10 @@
+mesh: "/assets/models/green/flag_B_green.gltf"
+name: "flagB"
+materials {
+  name: "platformer"
+  material: "/assets/materials/level.material"
+  textures {
+    sampler: "tex0"
+    texture: "/assets/models/green/platformer_texture.png"
+  }
+}
