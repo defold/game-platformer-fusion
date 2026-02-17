@@ -25,6 +25,15 @@ local GRAVITY = -28.0
 local GROUND_NORMAL_Y = 0.6
 local FALL_RESPAWN_Y = -10.0
 local RESPAWN_POSITION = vmath.vector3(0.0, 2.0, 0.0)
+local COYOTE_HANGTIME = 0.5
+
+local function play_animation(self, id)
+	if self.animation == id then
+		return
+	end
+	self.animation = id
+	model.play_anim("#model", id, go.PLAYBACK_LOOP_FORWARD)
+end
 
 local function update_boolean_action(action, current_value)
 	if action.pressed then
@@ -47,6 +56,17 @@ local function get_turn_axis(self)
 	return turn_axis
 end
 
+local function get_move_axis(self)
+	local move_axis = 0.0
+	if self.move_forward then
+		move_axis = move_axis + 1.0
+	end
+	if self.move_back then
+		move_axis = move_axis - 1.0
+	end
+	return move_axis
+end
+
 function init(self)
 	self.turn_left = false
 	self.turn_right = false
@@ -58,16 +78,16 @@ function init(self)
 	self.movement_vector = vmath.vector3(0.0, 0.0, 1.0)
 	self.yaw = 0.0
 	self.correction = vmath.vector3()
+	self.coyote_hangtime = 0
 
 	msg.post(".", "acquire_input_focus")
+	play_animation(self, "idle")
+	
 	print("player_controller initialized")
 end
 
-function final(self)
-	msg.post(".", "release_input_focus")
-end
-
 function update(self, dt)
+	self.coyote_hangtime = self.coyote_hangtime + dt
 	local was_grounded = self.grounded
 	self.grounded = false
 	self.correction = vmath.vector3()
@@ -78,22 +98,25 @@ function update(self, dt)
 	self.movement_vector.y = 0.0
 	self.movement_vector.z = math.cos(self.yaw)
 
-	local move_axis = 0.0
-	if self.move_forward then
-		move_axis = move_axis + 1.0
-	end
-	if self.move_back then
-		move_axis = move_axis - 1.0
-	end
-
+	local move_axis = get_move_axis(self)
 	local speed = move_axis >= 0.0 and MOVE_SPEED or BACKWARD_SPEED
 	self.velocity.x = self.movement_vector.x * move_axis * speed
 	self.velocity.z = self.movement_vector.z * move_axis * speed
 	self.velocity.y = self.velocity.y + GRAVITY * dt
+	if was_grounded then
+		if move_axis == 0 then
+			play_animation(self, "idle")
+		else
+			play_animation(self, "sprint")
+		end
+	elseif self.velocity.y < -2 then
+		play_animation(self, "fall")
+	end
 
-	if self.jump_queued and was_grounded then
+	if self.jump_queued and self.coyote_hangtime <= COYOTE_HANGTIME then
 		self.velocity.y = JUMP_SPEED
 		self.grounded = false
+		play_animation(self, "jump")
 	end
 	self.jump_queued = false
 
@@ -102,6 +125,8 @@ function update(self, dt)
 
 	if position.y <= FALL_RESPAWN_Y then
 		position = vmath.vector3(RESPAWN_POSITION)
+		self.yaw = 0.0
+		self.movement_vector = vmath.vector3(0.0, 0.0, 1.0)
 		self.velocity = vmath.vector3()
 		self.grounded = false
 		self.jump_queued = false
@@ -129,16 +154,19 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == CONTACT_POINT_RESPONSE then
-		if message.distance > 0.0 then
-			local projection = vmath.dot(self.correction, message.normal)
-			local compensation = (message.distance - projection) * message.normal
-			self.correction = self.correction + compensation
-			go.set_position(go.get_position() + compensation)
+		if message.other_group == hash("platform") then
+			--if message.distance > 0.0 then
+				local projection = vmath.dot(self.correction, message.normal)
+				local compensation = (message.distance - projection) * message.normal
+				self.correction = self.correction + compensation
+				go.set_position(go.get_position() + compensation)
 
-			if message.normal.y > GROUND_NORMAL_Y and self.velocity.y < 0.0 then
-				self.grounded = true
-				self.velocity.y = 0.0
-			end
+				if message.normal.y > GROUND_NORMAL_Y and self.velocity.y < 0.0 then
+					self.grounded = true
+					self.velocity.y = 0.0
+					self.coyote_hangtime = 0
+				end
+			--end
 		end
 	end
 end
