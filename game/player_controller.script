@@ -19,7 +19,7 @@ local CONTACT_POINT_RESPONSE = hash("contact_point_response")
 
 local MOVE_SPEED = 6.0
 local BACKWARD_SPEED = 4.0
-local TURN_SPEED = math.rad(160.0)
+local TURN_SPEED = math.rad(80.0)
 local JUMP_SPEED = 10.5
 local GRAVITY = -28.0
 local GROUND_NORMAL_Y = 0.6
