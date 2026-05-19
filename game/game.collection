@@ -1,16 +1,4 @@
-name: "gltf"
-instances {
-  id: "player"
-  prototype: "/game/player.go"
-  position {
-    y: 1.5
-    z: -3.0
-  }
-}
-collection_instances {
-  id: "level1"
-  collection: "/game/level1.collection"
-}
+name: "game"
 scale_along_z: 0
 embedded_instances {
   id: "camera"
@@ -30,11 +18,95 @@ embedded_instances {
   "}\n"
   ""
   position {
-    y: 5.0
+    x: 3.0
+    y: 10.0
     z: 5.0
   }
   rotation {
-    x: -0.16560513
-    w: 0.98619217
+    x: -0.17364818
+    w: 0.9848077
   }
+}
+embedded_instances {
+  id: "lobby"
+  data: "components {\n"
+  "  id: \"lobbyui\"\n"
+  "  component: \"/game/lobby.gui\"\n"
+  "}\n"
+  "components {\n"
+  "  id: \"lobby\"\n"
+  "  component: \"/game/lobby.script\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"level\"\n"
+  "  type: \"collectionfactory\"\n"
+  "  data: \"prototype: \\\"/game/level.collection\\\"\\n"
+  "load_dynamically: true\\n"
+  "\"\n"
+  "}\n"
+  ""
+  rotation {
+    y: 1.0
+    w: 6.123234E-17
+  }
+}
+embedded_instances {
+  id: "game"
+  data: "components {\n"
+  "  id: \"ui\"\n"
+  "  component: \"/game/game_ui.gui\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"playerfactory\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/game/prefabs/player/player.go\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"coinfactory\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/game/prefabs/coin/coin.go\\\"\\n"
+  "\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "sounds"
+  data: "embedded_components {\n"
+  "  id: \"coin\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sounds/coin.ogg\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"break\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sounds/break.ogg\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"fall\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sounds/fall.ogg\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"jump\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sounds/jump.ogg\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"land\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sounds/land.ogg\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"walking\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sounds/walking.ogg\\\"\\n"
+  "\"\n"
+  "}\n"
+  ""
 }

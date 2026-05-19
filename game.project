@@ -1,5 +1,6 @@
 [project]
 title = Blitz Buddies
+write_log_file = 1
 
 [bootstrap]
 main_collection = /game/game.collectionc
@@ -12,6 +13,7 @@ repeat_interval = 0.05
 width = 1000
 height = 800
 high_dpi = 1
+display_device_info = 1
 
 [script]
 shared_state = 1
@@ -45,4 +47,14 @@ texture_profiles = /all.texture_profiles
 
 [physics]
 type = 3D
+gravity_y = -40.0
+
+[model]
+max_count = 1024
+
+
+[render]
+clear_color_red = 0.3
+clear_color_green = 0.4
+clear_color_blue = 0.8
 

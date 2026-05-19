@@ -1,8 +1,6 @@
-local PLAYER_URL = "/player"
-
 local CAMERA_DISTANCE = 9.0
-local CAMERA_HEIGHT = 4.0
-local CAMERA_PITCH = math.rad(-20.0)
+local CAMERA_HEIGHT = 6.0
+local CAMERA_PITCH = math.rad(-40.0)
 local CAMERA_TARGET_HEIGHT = 2.0
 local POSITION_SMOOTH_SPEED = 10.0
 local ROTATION_SMOOTH_SPEED = 4.0
@@ -16,12 +14,16 @@ end
 function init(self)
 	self.smoothed_position = go.get_position()
 	self.smoothed_yaw = 0.0
+	self.follow_url = nil
 	print("camera_follow initialized")
 end
 
 function update(self, dt)
-	local player_position = go.get_position(PLAYER_URL)
-	local player_rotation = go.get_rotation(PLAYER_URL)
+	if not self.follow_url or not go.exists(self.follow_url) then
+		return
+	end
+	local player_position = go.get_position(self.follow_url)
+	local player_rotation = go.get_rotation(self.follow_url)
 	local player_forward = vmath.rotate(player_rotation, vmath.vector3(0.0, 0.0, 1.0))
 	local flat_forward = vmath.normalize(vmath.vector3(player_forward.x, 0.0, player_forward.z))
 
@@ -37,4 +39,10 @@ function update(self, dt)
 
 	go.set_position(self.smoothed_position)
 	go.set_rotation(vmath.quat_rotation_y(self.smoothed_yaw) * vmath.quat_rotation_x(CAMERA_PITCH))
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("follow") then
+		self.follow_url = message.url or sender
+	end
 end
