@@ -1,0 +1,209 @@
+local game_context = require("game.context")
+local messages = require("game.messages")
+local groups = require("game.groups")
+
+go.property("net_is_grounded", true)
+go.property("net_coins", 0)
+
+local GRAVITY = -0.5
+local MOVEMENT_SPEED = 4
+local ROTATION_SPEED = 1
+local JUMP_SPEED = 20
+local FALL_RESPAWN_Y = -14
+
+local ANIM_IDLE = "idle"
+local ANIM_WALK = "walk"
+local ANIM_JUMP_START = "jump"
+
+local ACTION_LEFT = hash("turn_left")
+local ACTION_RIGHT = hash("turn_right")
+local ACTION_FORWARD = hash("run_forward")
+local ACTION_BACK = hash("run_backward")
+local ACTION_JUMP = hash("jump")
+local ACTION_RPC = hash("rpc")
+
+local FORWARD_VECTOR = vmath.vector3(0, 0, 1)
+
+local function play_animation(self, id, playback)
+	if self.animation ~= id then
+		local previous = self.animation
+		local previous_playback = self.animation_playback
+		self.animation = id
+		self.animation_playback = playback
+		--print("play", id)
+		model.play_anim("#model", id, playback or go.PLAYBACK_LOOP_FORWARD, nil, function()
+			self.animation = previous
+			--print("done", id)
+			model.play_anim("#model", previous, previous_playback or go.PLAYBACK_LOOP_FORWARD)
+		end)
+	end
+end
+
+local function turn(self, value)
+	self.rotation = value
+	if fusion.has_authority() then
+		--realtime.raise_event(false, value, EVENT_TURN)
+	end
+end
+
+local function move(self, value)
+	if value == 0 then
+		play_animation(self, ANIM_IDLE)
+	else
+		play_animation(self, ANIM_WALK)
+	end
+	self.forward = value
+	if fusion.has_authority() then
+		--realtime.raise_event(false, value, EVENT_FORWARD)
+	end
+end
+
+local function jump(self, speed)
+	self.velocity.y = speed
+	self.ground_contact = false
+	play_animation(self, ANIM_JUMP_START, go.PLAYBACK_ONCE_FORWARD)
+	if fusion.has_authority() then
+		--realtime.raise_event(false, speed, EVENT_JUMP)
+	end
+end
+
+
+
+function init(self)
+	-- rotation around the y-axis
+	-- positive value = rotate clockwise, negative value = rotate counter clockwise, 
+	self.rotation = 0
+
+	-- movement in direction
+	-- positive value = move forward, negative value = move backwards
+	self.forward = 0
+
+	self.velocity = vmath.vector3()
+
+	-- for resolving physics collisions
+	self.correction = vmath.vector3()
+
+	-- currently played animation
+	self.animation = nil
+
+	self.original_position = go.get_position()
+	play_animation(self, ANIM_IDLE)
+end
+
+function final(self)
+end
+
+function update(self, dt)
+	if not fusion.has_authority() then
+		return
+	end
+
+	-- rotate model object around the y-axis
+	local rot = go.get_rotation()
+	rot = rot * vmath.quat_rotation_y(ROTATION_SPEED * -self.rotation * dt)
+	go.set_rotation(rot)
+
+	-- move in direction of facing
+	local dir = vmath.rotate(rot, FORWARD_VECTOR * self.forward * MOVEMENT_SPEED)
+
+	-- set velocity along the flow based on movement direction
+	-- also add gravity if in the air
+	self.velocity.x = dir.x
+	self.velocity.z = dir.z
+	if not self.ground_contact then
+		self.velocity.y = self.velocity.y + GRAVITY
+	end
+
+	-- update position
+	local pos = go.get_position()
+	pos = pos + self.velocity * dt
+
+	if pos.y < FALL_RESPAWN_Y then
+		self.velocity.y = 0
+		pos = self.original_position
+	end
+		
+	go.set_position(pos)
+
+	-- reset volatile variables
+	self.correction = vmath.vector3()
+	self.ground_contact = false
+end
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == messages.CONTACT_POINT_RESPONSE then
+		if message.other_group == groups.PLATFORM then
+			-- https://defold.com/manuals/physics-resolving-collisions/
+			if message.distance > 0 then
+				local proj = vmath.project(self.correction, message.normal * message.distance)
+				if proj < 1 then
+					local comp = (message.distance - message.distance * proj) * message.normal
+					go.set_position(go.get_position() + comp * 0.8)
+					self.correction = self.correction + comp
+				end
+			end
+			-- check for ground contact
+			-- clear vertical velocity if falling
+			if self.velocity.y <= 0 then
+				self.velocity.y = 0
+				self.ground_contact = true
+			end
+		end
+	elseif message_id == fusion.EVENT_OBJECT_READY then
+		local id = go.get_id()
+		local player_id = fusion.get_local_player_id()
+		if fusion.has_authority() then
+			msg.post(".", "acquire_input_focus")
+			print("player ready - has authority", id, "local player id", player_id, "owner id", fusion.get_owner_id(id))
+			game_context.local_player = go.get_id()
+		else
+			print("player ready - not authority", id, "local player id", player_id, "owner id", fusion.get_owner_id(id))
+		end
+	elseif message_id == messages.COIN_COLLECTED then
+		self.net_coins = self.net_coins + 1
+		msg.post("game#ui", messages.UPDATE_COIN_UI, { amount = self.net_coins })
+	end
+end
+
+
+function on_input(self, action_id, action)
+	if action_id == ACTION_LEFT then
+		if action.pressed then
+			turn(self, -1)
+		elseif action.released then
+			turn(self, 0)
+		end
+	elseif action_id == ACTION_RIGHT then
+		if action.pressed then
+			turn(self, 1)
+		elseif action.released then
+			turn(self, 0)
+		end
+	elseif action_id == ACTION_FORWARD then
+		if action.pressed then
+			move(self, 1)
+		elseif action.released then
+			move(self, 0)
+		end
+	elseif action_id == ACTION_BACK then
+		if action.pressed then
+			move(self, -1)
+		elseif action.released then
+			move(self, 0)
+		end
+	elseif action_id == ACTION_JUMP then
+		if action.pressed then
+			jump(self, JUMP_SPEED)
+		end
+	elseif action_id == ACTION_RPC then
+		if action.pressed then
+			print("send rpc")
+			local target = 0
+			local descriptor = "desc"
+			local event = "event"
+			local data = "data"
+			fusion.send_rpc(target, descriptor, event, data)
+		end
+	end
+end

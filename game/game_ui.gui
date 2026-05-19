@@ -1,0 +1,49 @@
+script: "/game/game_ui.gui_script"
+fonts {
+  name: "lilita_one_regular"
+  font: "/assets/fonts/lilita_one_regular.font"
+}
+textures {
+  name: "game"
+  texture: "/assets/game.atlas"
+}
+nodes {
+  position {
+    x: 85.0
+    y: 715.0
+  }
+  scale {
+    x: 0.5
+    y: 0.5
+  }
+  type: TYPE_BOX
+  texture: "game/coin"
+  id: "coin"
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_TOP
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 85.0
+  }
+  scale {
+    x: 2.0
+    y: 2.0
+    z: 2.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_TEXT
+  text: "x 0"
+  font: "lilita_one_regular"
+  id: "coin_text"
+  pivot: PIVOT_W
+  parent: "coin"
+  inherit_alpha: true
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT

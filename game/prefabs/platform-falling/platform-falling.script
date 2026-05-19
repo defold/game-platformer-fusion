@@ -1,0 +1,131 @@
+-- Networked platform that falls when stepped on and reactivates after a cooldown.
+-- Uses cooldown estimation so all clients see the fall and reactivation at the same time.
+
+local messages = require("game.messages")
+local groups = require("game.groups")
+
+go.property("net_cooldown_finish_time", 0)
+go.property("net_is_active", true)
+
+local FALL_DELAY = 0.2
+local REACTIVATION_DELAY = 1.0
+local FALL_SPEED = 30
+local FALL_GRAVITY = 25
+
+
+local function enable_collsions(self)
+	self.collsions_enabled = true
+	msg.post("#collisionobject", "enable")
+end
+local function disable_collisions(self)
+	self.collsions_enabled = false
+	msg.post("#collisionobject", "disable")
+end
+
+local function has_cooldown_expired(self)
+	return self.net_cooldown_finish_time > 0
+	   and fusion.get_network_time() > self.net_cooldown_finish_time
+end
+
+function init(self)
+	local props = {
+		[msg.url().fragment] = { "net_cooldown_finish_time", "net_is_active" }
+	}
+	fusion.create_map_object(1, fusion.OWNERMODE_MASTERCLIENT, props)
+
+	self.original_position = go.get_position()
+	self.is_falling = false
+	self.fall_velocity = 0
+	disable_collisions(self)
+end
+
+local function update_state(self)
+	-- Only state authority can change state
+	if not fusion.has_authority() then
+		return
+	end
+
+	-- Cooldown not set
+	if self.net_cooldown_finish_time <= 0 then
+		return
+	end
+
+	-- Cooldown not finished
+	if fusion.get_network_time() < self.net_cooldown_finish_time then
+		return
+	end
+
+	if self.net_is_active then
+		-- Schedule reactivation
+		self.net_is_active = false
+		self.net_cooldown_finish_time = fusion.get_network_time() + REACTIVATION_DELAY
+	else
+		-- Platform is active again
+		self.net_is_active = true
+		self.net_cooldown_finish_time = 0
+	end
+end
+
+function update(self, dt)
+	update_state(self)
+
+	if self.is_falling then
+		self.fall_velocity = self.fall_velocity + FALL_GRAVITY * dt
+		local pos = go.get_position()
+		pos.y = pos.y - self.fall_velocity * dt
+		go.set_position(pos)
+	end
+
+	-- We are not waiting until net_is_active state comes from state authority
+	-- but we estimate the current correct state based on the cooldown expiration.
+	-- This ensures that clients don't have an advantage (otherwise their time to
+	-- jump before the platform falls would be fall_delay + ping).
+	-- Invert authority state when local cooldown expired — this is client-side prediction
+	-- so the platform falls immediately without waiting for the network round-trip.
+	local is_active
+	if has_cooldown_expired(self) then
+		is_active = not self.net_is_active
+	else
+		is_active = self.net_is_active
+	end
+
+	
+	if is_active ~= self.is_falling
+	and self.collisions_enabled ~= is_active then
+		return -- No change
+	end
+
+	if is_active then
+		self.is_falling = false
+		self.fall_velocity = 0
+		go.set_position(self.original_position)
+	else
+		self.is_falling = true
+		self.fall_velocity = FALL_SPEED
+	end
+end
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == fusion.EVENT_OBJECT_READY then
+		enable_collsions(self)
+	elseif message_id == messages.COLLISION_RESPONSE then
+		if message.other_group == groups.PLAYER then
+			-- Platforms falling is initiated only on state authority
+			if not fusion.has_authority() then
+				return
+			end
+
+			if not self.net_is_active then
+				return
+			end
+
+			if self.net_cooldown_finish_time > 0 then
+				return -- Falling is already initiated
+			end
+
+			-- Start the fall delay cooldown
+			self.net_cooldown_finish_time = fusion.get_network_time() + FALL_DELAY
+		end
+	end
+end

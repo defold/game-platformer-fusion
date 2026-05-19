@@ -1,0 +1,403 @@
+name: "level2"
+instances {
+  id: "coin"
+  prototype: "/game/prefabs/coin/coin.go"
+  position {
+    x: 9.856496
+    y: 1.0
+    z: 1.0
+  }
+}
+instances {
+  id: "platform-falling"
+  prototype: "/game/prefabs/platform-falling/platform-falling.go"
+  position {
+    y: 0.379429
+    z: 5.0
+  }
+}
+instances {
+  id: "platform-falling1"
+  prototype: "/game/prefabs/platform-falling/platform-falling.go"
+  position {
+    y: 2.101323
+    z: 8.256157
+  }
+}
+instances {
+  id: "coin1"
+  prototype: "/game/prefabs/coin/coin.go"
+  position {
+    x: -10.480354
+    y: 1.0
+    z: 1.0
+  }
+}
+instances {
+  id: "coin2"
+  prototype: "/game/prefabs/coin/coin.go"
+  position {
+    x: 7.641152
+    y: 1.0
+    z: 1.0
+  }
+}
+instances {
+  id: "platform-falling2"
+  prototype: "/game/prefabs/platform-falling/platform-falling.go"
+  position {
+    x: 7.596478
+    y: 2.101323
+    z: 11.786199
+  }
+  rotation {
+    y: 0.24838836
+    w: 0.96866053
+  }
+}
+instances {
+  id: "platform-falling3"
+  prototype: "/game/prefabs/platform-falling/platform-falling.go"
+  position {
+    x: 3.632012
+    y: 2.101323
+    z: 11.009269
+  }
+  rotation {
+    x: -8.62994E-17
+    y: 0.057656236
+    z: -1.9859909E-16
+    w: 0.9983365
+  }
+}
+instances {
+  id: "platform-medium6"
+  prototype: "/game/prefabs/platform-medium.go"
+  position {
+    x: -6.0
+  }
+}
+instances {
+  id: "platform-medium1"
+  prototype: "/game/prefabs/platform-medium.go"
+  position {
+    x: 8.873185
+    z: 1.253548
+  }
+  rotation {
+    x: -1.103162E-17
+    y: -0.25128937
+    z: -5.563774E-17
+    w: 0.967912
+  }
+}
+instances {
+  id: "platform1"
+  prototype: "/game/prefabs/platform.go"
+  position {
+    x: 4.396467
+  }
+}
+instances {
+  id: "platform2"
+  prototype: "/game/prefabs/platform.go"
+  position {
+    x: 12.573842
+    y: 1.592772
+    z: 2.425753
+  }
+}
+instances {
+  id: "platform-large"
+  prototype: "/game/prefabs/platform-large.go"
+  position {
+    x: 13.110653
+    y: 1.719637
+    z: 8.799836
+  }
+  rotation {
+    y: -0.1958134
+    w: 0.9806412
+  }
+}
+instances {
+  id: "platform3"
+  prototype: "/game/prefabs/platform.go"
+  position {
+    x: -10.453562
+    y: 0.241438
+    z: 1.083532
+  }
+  rotation {
+    x: -2.9117876E-18
+    y: 0.19220693
+    z: 2.8050338E-18
+    w: 0.9813544
+  }
+}
+instances {
+  id: "platform-large1"
+  prototype: "/game/prefabs/platform-large.go"
+  position {
+    x: -15.060275
+    y: 0.682599
+    z: 3.747138
+  }
+  rotation {
+    y: 0.087155744
+    w: 0.9961947
+  }
+}
+instances {
+  id: "platform-falling4"
+  prototype: "/game/prefabs/platform-falling/platform-falling.go"
+  position {
+    x: -12.818017
+    z: 7.820209
+  }
+  rotation {
+    y: 0.087155744
+    w: 0.9961947
+  }
+}
+instances {
+  id: "platform4"
+  prototype: "/game/prefabs/platform.go"
+  position {
+    x: -15.711709
+    z: 8.180042
+  }
+  rotation {
+    y: 0.087155744
+    w: 0.9961947
+  }
+}
+instances {
+  id: "platform5"
+  prototype: "/game/prefabs/platform.go"
+  position {
+    x: -12.503804
+    y: 0.693553
+    z: 10.803197
+  }
+  rotation {
+    y: 0.104528464
+    w: 0.9945219
+  }
+}
+instances {
+  id: "platform-falling5"
+  prototype: "/game/prefabs/platform-falling/platform-falling.go"
+  position {
+    x: -15.5767
+    y: 0.791523
+    z: 11.269252
+  }
+  rotation {
+    y: 0.104528464
+    w: 0.9945219
+  }
+}
+instances {
+  id: "platform-falling6"
+  prototype: "/game/prefabs/platform-falling/platform-falling.go"
+  position {
+    x: -11.811749
+    y: 1.339339
+    z: 13.840333
+  }
+  rotation {
+    y: 0.12186934
+    w: 0.99254614
+  }
+}
+instances {
+  id: "platform6"
+  prototype: "/game/prefabs/platform.go"
+  position {
+    x: -15.01447
+    y: 1.33026
+    z: 14.35435
+  }
+  rotation {
+    y: 0.12186934
+    w: 0.99254614
+  }
+}
+instances {
+  id: "platform7"
+  prototype: "/game/prefabs/platform.go"
+  position {
+    x: -11.415963
+    y: 2.118482
+    z: 16.812418
+  }
+  rotation {
+    y: 0.1391731
+    w: 0.99026805
+  }
+}
+instances {
+  id: "platform-falling7"
+  prototype: "/game/prefabs/platform-falling/platform-falling.go"
+  position {
+    x: -14.388624
+    y: 1.71854
+    z: 17.50227
+  }
+  rotation {
+    y: 0.1391731
+    w: 0.99026805
+  }
+}
+instances {
+  id: "platform-large2"
+  prototype: "/game/prefabs/platform-large.go"
+  position {
+    x: -11.72104
+    y: 2.592135
+    z: 21.519299
+  }
+  rotation {
+    y: 0.15643446
+    w: 0.98768836
+  }
+}
+instances {
+  id: "coin3"
+  prototype: "/game/prefabs/coin/coin.go"
+  position {
+    x: -13.014364
+    y: 1.0
+    z: 7.695433
+  }
+}
+instances {
+  id: "coin4"
+  prototype: "/game/prefabs/coin/coin.go"
+  position {
+    x: -15.599668
+    y: 1.725761
+    z: 10.920597
+  }
+}
+instances {
+  id: "coin5"
+  prototype: "/game/prefabs/coin/coin.go"
+  position {
+    x: -11.781577
+    y: 2.183528
+    z: 13.83028
+  }
+}
+instances {
+  id: "platform-round"
+  prototype: "/game/prefabs/platform-round.go"
+}
+instances {
+  id: "platform-round1"
+  prototype: "/game/prefabs/platform-round.go"
+  position {
+    x: -2.222034
+    y: 2.465748
+    z: 14.043998
+  }
+}
+instances {
+  id: "platform-medium"
+  prototype: "/game/prefabs/platform-medium.go"
+  position {
+    x: -6.514037
+    y: 3.119823
+    z: 19.21681
+  }
+  rotation {
+    y: 0.17364818
+    w: 0.9848077
+  }
+}
+instances {
+  id: "platform-medium2"
+  prototype: "/game/prefabs/platform-medium.go"
+  position {
+    x: -1.034283
+    y: 4.568764
+    z: 19.696877
+  }
+  rotation {
+    y: 0.17364818
+    w: 0.9848077
+  }
+}
+instances {
+  id: "platform-medium3"
+  prototype: "/game/prefabs/platform-medium.go"
+  position {
+    x: 1.855599
+    y: 6.493438
+    z: 23.932077
+  }
+  rotation {
+    y: 0.17364818
+    w: 0.9848077
+  }
+}
+instances {
+  id: "platform-falling8"
+  prototype: "/game/prefabs/platform-falling/platform-falling.go"
+  position {
+    x: 5.677981
+    y: 8.575824
+    z: 24.561852
+  }
+}
+instances {
+  id: "platform-round2"
+  prototype: "/game/prefabs/platform-round.go"
+  position {
+    x: 10.3252
+    y: 10.585814
+    z: 24.575006
+  }
+}
+instances {
+  id: "coin6"
+  prototype: "/game/prefabs/coin/coin.go"
+  position {
+    x: 12.015583
+    y: 2.881264
+    z: 8.602157
+  }
+}
+instances {
+  id: "coin7"
+  prototype: "/game/prefabs/coin/coin.go"
+  position {
+    x: 13.774202
+    y: 2.881264
+    z: 7.448119
+  }
+}
+instances {
+  id: "coin8"
+  prototype: "/game/prefabs/coin/coin.go"
+  position {
+    x: 13.175878
+    y: 2.881264
+    z: 10.07897
+  }
+}
+instances {
+  id: "coin9"
+  prototype: "/game/prefabs/coin/coin.go"
+  position {
+    x: 5.584869
+    y: 9.625446
+    z: 24.701548
+  }
+}
+scale_along_z: 0
+embedded_instances {
+  id: "go"
+  data: ""
+}

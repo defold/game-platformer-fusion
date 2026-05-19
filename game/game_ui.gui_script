@@ -1,0 +1,12 @@
+local messages = require("game.messages")
+
+function init(self)
+	
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == messages.UPDATE_COIN_UI then
+		local coin_text = gui.get_node("coin_text")
+		gui.set_text(coin_text, ("x %s"):format(message.amount))
+	end
+end

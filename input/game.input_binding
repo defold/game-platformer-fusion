@@ -34,3 +34,11 @@ key_trigger {
   input: KEY_RIGHT
   action: "turn_right"
 }
+key_trigger {
+  input: KEY_TAB
+  action: "toggle_debug"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_LEFT
+  action: "touch"
+}
