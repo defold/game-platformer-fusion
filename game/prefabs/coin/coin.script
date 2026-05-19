@@ -24,10 +24,13 @@ local function set_active(self, active)
 end
 
 function init(self)
-	local props = {
-		[msg.url().fragment] = { "net_active" }
+	local options = {
+		properties = {
+			[msg.url().fragment] = { "net_active" }
+		},
+		replication_mode = fusion.REPLICATION_MODE_NONE
 	}
-	fusion.create_map_object(1, fusion.OWNERMODE_PLAYERATTACHED, props)
+	fusion.create_map_object(1, fusion.OWNERMODE_MASTERCLIENT, options)
 	
 	fusion.subscribe_rpc(messages.RPC_COLLECTED)
 
@@ -62,8 +65,7 @@ function on_message(self, message_id, message, sender)
 				local owner_id = fusion.get_owner_id(coin_id)
 				local target_object_id = coin_id
 				local data = { collector_id = owner_id, coin_id = coin_id }
-				local ok = fusion.send_rpc(owner_id, target_object_id, messages.RPC_REQUEST_COLLECTED, data)
-				--local ok = fusion.send_rpc(fusion.OBJECT_OWNER_PLAYER_ID, target_object_id, messages.RPC_REQUEST_COLLECTED, data)
+				local ok = fusion.send_rpc(fusion.OBJECT_OWNER_PLAYER_ID, target_object_id, messages.RPC_REQUEST_COLLECTED, data)
 				if not ok then
 					print("Error sending rpc")
 					return

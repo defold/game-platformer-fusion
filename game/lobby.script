@@ -103,10 +103,13 @@ local function spawn_player()
 	local rot = nil
 	local scene = 1
 	local owner_mode = fusion.OWNERMODE_PLAYERATTACHED
-	local props = {
-		player = { "net_coins", "net_is_grounded" }
+	local options = {
+		properties = {
+			player = { "net_coins", "net_is_grounded" }
+		},
+		replication_mode = fusion.REPLICATION_MODE_AUTO,
 	}
-	local id = fusion.spawn("game#playerfactory", pos, rot, scene, owner_mode, props)
+	local id = fusion.spawn("game#playerfactory", pos, rot, scene, owner_mode, options)
 	log("spawned player with id %s", id)
 	msg.post("camera", "follow", { url = id })
 end
