@@ -53,9 +53,6 @@ gravity_y = -40.0
 [model]
 max_count = 1024
 
-[fusion]
-app_id = 98c13f6b-d277-4a55-b9a9-24373e392d21
-
 [render]
 clear_color_red = 0.3
 clear_color_green = 0.4
