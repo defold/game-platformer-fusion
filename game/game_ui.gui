@@ -45,5 +45,24 @@ nodes {
   parent: "coin"
   inherit_alpha: true
 }
+nodes {
+  position {
+    x: 500.0
+    y: 400.0
+  }
+  scale {
+    x: 2.0
+    y: 2.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_TEXT
+  text: "Winner is Player3233!"
+  font: "lilita_one_regular"
+  id: "win_label"
+  inherit_alpha: true
+}
 material: "/builtins/materials/gui.material"
 adjust_reference: ADJUST_REFERENCE_PARENT

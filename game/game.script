@@ -1,0 +1,63 @@
+local game_context = require("game.context")
+local messages = require("game.messages")
+local log = require("game.utils.log")
+
+go.property("net_winner", 0)
+
+local MIN_COINS_TO_WIN = 1
+
+local function spawn_player()
+	log("spawn player")
+	local pos = vmath.vector3(0,3,0)
+	local rot = nil
+	local map = 1
+	local owner_mode = fusion.OWNERMODE_PLAYERATTACHED
+	local options = {
+		properties = {
+			player = { "net_coins", "net_is_grounded" }
+		},
+		replication_mode = fusion.REPLICATION_MODE_AUTO,
+	}
+	local id = fusion.spawn("#playerfactory", pos, rot, map, owner_mode, options)
+	log("spawned player with id %s", id)
+	msg.post(game_context.camera, "follow", { url = id })
+end
+
+function init(self)
+	print("init game")
+	game_context.game = msg.url()
+
+	local options = {
+		properties = {
+			[msg.url().fragment] = { "net_winner" }
+		},
+		replication_mode = fusion.REPLICATION_MODE_NONE
+	}
+	fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
+	spawn_player()
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == messages.FLAG_REACHED then
+		local player_url = msg.url(nil, message.player_id, "player")
+		local net_coins = go.get(player_url, "net_coins")
+		if net_coins < MIN_COINS_TO_WIN then
+			-- not enough coins
+			return
+		end
+
+		if self.net_winner > 0 then
+			-- someone else won first
+			return
+		end
+		
+		self.net_winner = fusion.get_owner_id(message.player_id)
+
+		msg.post(game_context.ui, messages.GAME_WINNER_CHANGED, { winner = self.net_winner })
+
+		timer.delay(5, false, function()
+			self.net_winner = -1
+			fusion.send_rpc(0, nil, messages.RPC_RESPAWN_ALL_PLAYERS, {})
+		end)
+	end
+end

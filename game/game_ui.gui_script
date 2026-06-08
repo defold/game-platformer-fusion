@@ -1,12 +1,22 @@
+local game_context = require("game.context")
 local messages = require("game.messages")
 
 function init(self)
-	
+	game_context.ui = msg.url()
+	gui.set_enabled(gui.get_node("win_label"), false)
 end
 
 function on_message(self, message_id, message, sender)
 	if message_id == messages.UPDATE_COIN_UI then
 		local coin_text = gui.get_node("coin_text")
 		gui.set_text(coin_text, ("x %s"):format(message.amount))
+	elseif message_id == messages.GAME_WINNER_CHANGED then
+		local win_label = gui.get_node("win_label")
+		if message.winner >= 0 then
+			gui.set_enabled(win_label, true)
+			gui.set_text(win_label, "Winner is Player" .. message.winner)
+		else
+			gui.set_enabled(win_label, false)
+		end
 	end
 end

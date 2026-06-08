@@ -1,3 +1,7 @@
+components {
+  id: "flag"
+  component: "/game/prefabs/flag/flag.script"
+}
 embedded_components {
   id: "model"
   type: "model"
@@ -5,9 +9,13 @@ embedded_components {
   "name: \"{{NAME}}\"\n"
   "materials {\n"
   "  name: \"colormap\"\n"
-  "  material: \"/builtins/materials/model_instanced.material\"\n"
+  "  material: \"/shadow_mapping/materials/high/diffuse.material\"\n"
   "  textures {\n"
   "    sampler: \"tex0\"\n"
+  "    texture: \"/assets/models/kenney_platformer/Textures/colormap.png\"\n"
+  "  }\n"
+  "  textures {\n"
+  "    sampler: \"tex_depth\"\n"
   "    texture: \"/assets/models/kenney_platformer/Textures/colormap.png\"\n"
   "  }\n"
   "}\n"

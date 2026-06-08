@@ -3,7 +3,8 @@ title = Blitz Buddies
 write_log_file = 1
 
 [bootstrap]
-main_collection = /game/game.collectionc
+main_collection = /game/lobby/lobby.collectionc
+render = /shadow_mapping/render/custom.renderc
 
 [input]
 game_binding = /input/game.input_bindingc
@@ -52,6 +53,8 @@ gravity_y = -40.0
 [model]
 max_count = 1024
 
+[fusion]
+app_id = 98c13f6b-d277-4a55-b9a9-24373e392d21
 
 [render]
 clear_color_red = 0.3

@@ -38,7 +38,31 @@ key_trigger {
   input: KEY_TAB
   action: "toggle_debug"
 }
+key_trigger {
+  input: KEY_1
+  action: "one"
+}
+key_trigger {
+  input: KEY_2
+  action: "two"
+}
+key_trigger {
+  input: KEY_3
+  action: "three"
+}
+key_trigger {
+  input: KEY_4
+  action: "four"
+}
+key_trigger {
+  input: KEY_BACKSPACE
+  action: "backspace"
+}
 mouse_trigger {
   input: MOUSE_BUTTON_LEFT
   action: "touch"
+}
+text_trigger {
+  input: TEXT
+  action: "text"
 }

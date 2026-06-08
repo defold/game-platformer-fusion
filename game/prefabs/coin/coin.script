@@ -30,7 +30,7 @@ function init(self)
 		},
 		replication_mode = fusion.REPLICATION_MODE_NONE
 	}
-	fusion.create_map_object(1, fusion.OWNERMODE_MASTERCLIENT, options)
+	fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
 	
 	fusion.subscribe_rpc(messages.RPC_COLLECTED)
 
@@ -63,13 +63,10 @@ function on_message(self, message_id, message, sender)
 				-- send rpc to the coin on the owning client
 				local coin_id = go.get_id()
 				local owner_id = fusion.get_owner_id(coin_id)
+				local target_player_id = fusion.OBJECT_OWNER_PLAYER_ID
 				local target_object_id = coin_id
 				local data = { collector_id = owner_id, coin_id = coin_id }
-				local ok = fusion.send_rpc(fusion.OBJECT_OWNER_PLAYER_ID, target_object_id, messages.RPC_REQUEST_COLLECTED, data)
-				if not ok then
-					print("Error sending rpc")
-					return
-				end
+				fusion.send_rpc(target_player_id, target_object_id, messages.RPC_REQUEST_COLLECTED, data)
 
 				-- Even clients without authority will temporarily modify (predict) this networked
 				-- property to have immediate visual feedback. Process method makes sure the coin
@@ -92,9 +89,9 @@ function on_message(self, message_id, message, sender)
 		fusion.send_rpc(message.data.collector_id, go.get_id(), messages.RPC_COLLECTED)
 	elseif message_id == messages.RPC_COLLECTED then
 		msg.post(game_context.local_player, messages.COIN_COLLECTED)
-		sound.play("/sounds#coin")
+		msg.post(game_context.sounds, messages.COIN_COLLECTED)
 	elseif message_id == fusion.EVENT_OBJECT_READY then
-		print("coin is ready", go.get_id(), "my owner is", fusion.get_owner_id())
+		--print("coin is ready", go.get_id(), "my owner is", fusion.get_owner_id())
 	elseif message_id == fusion.EVENT_OBJECT_OWNER_CHANGED then
 		print("coin owner changed")
 		pprint(message)

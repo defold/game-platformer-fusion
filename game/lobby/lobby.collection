@@ -1,0 +1,47 @@
+name: "lobby"
+scale_along_z: 0
+embedded_instances {
+  id: "lobby"
+  data: "components {\n"
+  "  id: \"lobbyui\"\n"
+  "  component: \"/game/lobby/lobby.gui\"\n"
+  "}\n"
+  "components {\n"
+  "  id: \"lobby\"\n"
+  "  component: \"/game/lobby/lobby.script\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"game\"\n"
+  "  type: \"collectionfactory\"\n"
+  "  data: \"prototype: \\\"/game/game.collection\\\"\\n"
+  "\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "camera"
+  data: "components {\n"
+  "  id: \"camera_follow\"\n"
+  "  component: \"/game/camera_follow.script\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"camera\"\n"
+  "  type: \"camera\"\n"
+  "  data: \"aspect_ratio: 1.0\\n"
+  "fov: 0.7854\\n"
+  "near_z: 0.1\\n"
+  "far_z: 1000.0\\n"
+  "auto_aspect_ratio: 1\\n"
+  "\"\n"
+  "}\n"
+  ""
+  position {
+    x: 3.0
+    y: 10.0
+    z: 5.0
+  }
+  rotation {
+    x: -0.17364818
+    w: 0.9848077
+  }
+}

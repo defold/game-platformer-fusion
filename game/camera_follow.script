@@ -1,3 +1,5 @@
+local game_context = require("game.context")
+
 local CAMERA_DISTANCE = 9.0
 local CAMERA_HEIGHT = 6.0
 local CAMERA_PITCH = math.rad(-40.0)
@@ -12,31 +14,32 @@ local function lerp_angle(from, to, t)
 end
 
 function init(self)
+	game_context.camera = msg.url()
 	self.smoothed_position = go.get_position()
 	self.smoothed_yaw = 0.0
 	self.follow_url = nil
-	print("camera_follow initialized")
+end
+
+local function get_target_position(self)
+	local player_position = go.get_position(self.follow_url)
+	local player_rotation = go.get_rotation(self.follow_url)
+	local player_forward = vmath.rotate(player_rotation, vmath.vector3(0.0, 0.0, 1.0))
+	local flat_forward = vmath.normalize(vmath.vector3(player_forward.x, 0.0, player_forward.z))
+	local camera_position = player_position + vmath.vector3(0.0, CAMERA_TARGET_HEIGHT, 0.0) - flat_forward * CAMERA_DISTANCE + vmath.vector3(0.0, CAMERA_HEIGHT, 0.0)
+	local yaw = math.atan2(flat_forward.x, flat_forward.z) + math.pi
+
+	return camera_position, yaw
 end
 
 function update(self, dt)
 	if not self.follow_url or not go.exists(self.follow_url) then
 		return
 	end
-	local player_position = go.get_position(self.follow_url)
-	local player_rotation = go.get_rotation(self.follow_url)
-	local player_forward = vmath.rotate(player_rotation, vmath.vector3(0.0, 0.0, 1.0))
-	local flat_forward = vmath.normalize(vmath.vector3(player_forward.x, 0.0, player_forward.z))
-
-	local target = player_position + vmath.vector3(0.0, CAMERA_TARGET_HEIGHT, 0.0)
-	local camera_position = target - flat_forward * CAMERA_DISTANCE + vmath.vector3(0.0, CAMERA_HEIGHT, 0.0)
-	local yaw = math.atan2(flat_forward.x, flat_forward.z) + math.pi
-
+	local camera_position, yaw = get_target_position(self)
 	local position_alpha = 1.0 - math.exp(-POSITION_SMOOTH_SPEED * dt)
 	local rotation_alpha = 1.0 - math.exp(-ROTATION_SMOOTH_SPEED * dt)
-
 	self.smoothed_position = self.smoothed_position + (camera_position - self.smoothed_position) * position_alpha
 	self.smoothed_yaw = lerp_angle(self.smoothed_yaw, yaw, rotation_alpha)
-
 	go.set_position(self.smoothed_position)
 	go.set_rotation(vmath.quat_rotation_y(self.smoothed_yaw) * vmath.quat_rotation_x(CAMERA_PITCH))
 end
@@ -44,5 +47,8 @@ end
 function on_message(self, message_id, message, sender)
 	if message_id == hash("follow") then
 		self.follow_url = message.url or sender
+		local camera_position, yaw = get_target_position(self)
+		self.smoothed_position = camera_position
+		self.smoothed_yaw = yaw
 	end
 end

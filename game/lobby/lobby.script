@@ -1,0 +1,98 @@
+local messages = require("game.messages")
+local log = require("game.utils.log")
+local wait = require("game.utils.wait")
+
+math.randomseed(socket.gettime() + sys.get_config_int("project.instance_index", 1))
+
+local function connect(username)
+	username = username or ("user" .. math.random(999999))
+	log("connect username: '%s'", username)
+	fusion.on_event(function(self, event_id, event)
+		if event_id == fusion.EVENT_OBJECT_OWNER_CHANGED then
+			--msg.post(event.id, fusion.EVENT_OBJECT_OWNER_CHANGED, event)
+		elseif event_id == fusion.EVENT_OBJECT_READY then
+			--msg.post(event.id, fusion.EVENT_OBJECT_READY, event)
+		else
+			print("Fusion event", event_id)
+		end
+	end)
+
+	fusion.subscribe_rpc(messages.RPC_RESPAWN_ALL_PLAYERS)
+
+	fusion.connect(username)
+	wait.until_true(function()
+		return fusion.is_connected()
+	end)
+end
+
+local function join_room(name)
+	if not name or #name == 0 then
+		name = "defaultroom"
+	end
+	log("join_room name: '%s'", name)
+	local room_options = {
+		is_visible = true,
+		is_open = true,
+		max_players = 10,
+		lobby_name = name,
+		custom_properties = {
+			foo = "bar",
+			baz = 1,
+			boo = true
+		}
+	}
+	local matchmaking_options = {
+		max_players = 10,
+		lobby_name = name,
+	}
+	fusion.join_or_create_room_random(room_options, matchmaking_options)
+	wait.until_true(function()
+		return fusion.is_in_room()
+	end)
+end
+
+local function start_fusion()
+	log("start fusion")
+	fusion.start()
+	wait.until_true(function()
+		return fusion.is_started()
+	end)
+end
+
+local function start_game()
+	local url = "#game"
+	local status = collectionfactory.get_status(url)
+	if status == collectionfactory.STATUS_UNLOADED then
+		collectionfactory.load(url, function() end)
+	end
+	wait.until_true(function()
+		return collectionfactory.get_status(url) == collectionfactory.STATUS_LOADED
+	end)
+	local pos = vmath.vector3(0)
+	collectionfactory.create(url, pos)
+end
+
+local function start_connect_flow(message)
+	coroutine.wrap(function()
+		fusion.init_from_settings()
+		fusion.enable_debug(true)
+		connect(message.username)
+		join_room(message.roomname)
+		start_fusion()
+		start_game()
+	end)()
+end
+
+function init(self)
+	sys.set_error_handler(function(source, message, traceback)
+		log("ERROR: (%s) %s %s", source, message, traceback)
+	end)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("start_connect_flow") then
+		start_connect_flow(message)
+	else
+		print("MESSAGE", message_id)
+	end
+end

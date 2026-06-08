@@ -1,0 +1,12 @@
+local game_context = require("game.context")
+local messages = require("game.messages")
+
+function init(self)
+	game_context.sounds = msg.url()
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == messages.COIN_COLLECTED then
+		sound.play("#coin")
+	end
+end

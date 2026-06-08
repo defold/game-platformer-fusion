@@ -9,7 +9,7 @@ embedded_components {
   "name: \"{{NAME}}\"\n"
   "materials {\n"
   "  name: \"colormap\"\n"
-  "  material: \"/builtins/materials/model_instanced.material\"\n"
+  "  material: \"/shadow_mapping/materials/mid/diffuse.material\"\n"
   "  textures {\n"
   "    sampler: \"tex0\"\n"
   "    texture: \"/assets/models/kenney_platformer/Textures/colormap.png\"\n"

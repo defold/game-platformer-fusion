@@ -162,7 +162,7 @@ function on_message(self, message_id, message, sender)
 		end
 	elseif message_id == messages.COIN_COLLECTED then
 		self.net_coins = self.net_coins + 1
-		msg.post("game#ui", messages.UPDATE_COIN_UI, { amount = self.net_coins })
+		msg.post(game_context.ui, messages.UPDATE_COIN_UI, { amount = self.net_coins })
 	end
 end
 

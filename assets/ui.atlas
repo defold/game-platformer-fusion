@@ -1,0 +1,16 @@
+images {
+  image: "/assets/images/blue_button06.png"
+}
+images {
+  image: "/assets/images/blue_button11.png"
+}
+images {
+  image: "/assets/images/grey_panel.png"
+}
+images {
+  image: "/assets/images/blue_panel.png"
+}
+images {
+  image: "/assets/images/grey_button06.png"
+}
+extrude_borders: 2

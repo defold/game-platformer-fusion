@@ -12,6 +12,39 @@ function M.show(id)
 	gui.set_enabled(gui.get_node(id), true)
 end
 
+function M.input(self, id, action_id, action, callback)
+	local node = gui.get_node(id)
+	if action.x and action.y then
+		if action.pressed then
+			self.input = nil
+			if is_picked(node, action.x, action.y) then
+				self.pressed = node
+			end
+		elseif action.released then
+			if is_picked(node, action.x, action.y) then
+				if self.pressed == node then
+					self.input = node
+					self.pressed = nil
+				end
+			end
+		end
+	end
+
+	local text = gui.get_text(node)
+	if action_id == hash("backspace") then
+		if action.released and self.input == node then
+			text = text:sub(1, -2)
+			gui.set_text(node, text)
+		end
+	elseif action.text then
+		if self.input == node then
+			text = text .. action.text
+			gui.set_text(node, text)
+		end
+	end
+	return text
+end
+
 function M.button(self, id, action, callback)
 	if not action.x or not action.y then
 		return
@@ -47,8 +80,4 @@ function M.button(self, id, action, callback)
 	return false
 end
 
-return setmetatable(M, {
-	__call = function(t, ...)
-		return M.button(...)
-	end
-})
+return M

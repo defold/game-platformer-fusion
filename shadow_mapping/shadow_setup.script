@@ -1,0 +1,28 @@
+local shadow_mapping = require "shadow_mapping.shadow_mapping"
+
+function init(self)
+    ---Shadows settings
+    local width = 10000
+    local height = 10000
+    local near = 1
+    local far = 20000
+    local proj = vmath.matrix4_orthographic(-width / 2, width / 2, -height / 2, height / 2, near, far)
+    shadow_mapping.set_light_projection(proj)
+
+    local position = go.get_world_position()
+    local rotation = go.get_rotation()
+    shadow_mapping.calculate_light_transform(position, rotation)
+
+    msg.post("#", "acquire_input_focus")
+end
+
+
+function update(self, dt)
+    local position = go.get_position()
+    local rotation = go.get_rotation()
+    --shadow_mapping.calculate_light_transform(position, rotation)
+end
+
+
+function on_input(self, action_id, action)
+end

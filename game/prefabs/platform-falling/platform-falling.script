@@ -1,6 +1,7 @@
 -- Networked platform that falls when stepped on and reactivates after a cooldown.
 -- Uses cooldown estimation so all clients see the fall and reactivation at the same time.
 
+local game_context = require("game.context")
 local messages = require("game.messages")
 local groups = require("game.groups")
 
@@ -34,7 +35,7 @@ function init(self)
 		},
 		replication_mode = fusion.REPLICATION_MODE_NONE,
 	}
-	fusion.create_map_object(1, fusion.OWNERMODE_MASTERCLIENT, options)
+	fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
 
 	self.original_position = go.get_position()
 	self.is_falling = false
