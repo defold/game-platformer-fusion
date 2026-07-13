@@ -24,29 +24,29 @@ end
 
 local function create_depth_buffer(name, w, h)
     local color_params = {
-        format = render.FORMAT_RGBA,
+        format = graphics.TEXTURE_FORMAT_RGBA,
         width = w,
         height = h,
-        min_filter = render.FILTER_NEAREST,
-        mag_filter = render.FILTER_NEAREST,
-        u_wrap = render.WRAP_CLAMP_TO_EDGE,
-        v_wrap = render.WRAP_CLAMP_TO_EDGE
+        min_filter = graphics.TEXTURE_FILTER_NEAREST,
+        mag_filter = graphics.TEXTURE_FILTER_NEAREST,
+        u_wrap = graphics.TEXTURE_WRAP_CLAMP_TO_EDGE,
+        v_wrap = graphics.TEXTURE_WRAP_CLAMP_TO_EDGE
     }
 
     local depth_params = {
-        format = render.FORMAT_DEPTH,
+        format = graphics.TEXTURE_FORMAT_DEPTH,
         width = w,
         height = h,
-        min_filter = render.FILTER_NEAREST,
-        mag_filter = render.FILTER_NEAREST,
-        u_wrap = render.WRAP_CLAMP_TO_EDGE,
-        v_wrap = render.WRAP_CLAMP_TO_EDGE
+        min_filter = graphics.TEXTURE_FILTER_NEAREST,
+        mag_filter = graphics.TEXTURE_FILTER_NEAREST,
+        u_wrap = graphics.TEXTURE_WRAP_CLAMP_TO_EDGE,
+        v_wrap = graphics.TEXTURE_WRAP_CLAMP_TO_EDGE
     }
 
     return render.render_target(name,
         {
-            [render.BUFFER_COLOR_BIT] = color_params,
-            [render.BUFFER_DEPTH_BIT] = depth_params
+            [graphics.BUFFER_TYPE_COLOR0_BIT] = color_params,
+            [graphics.BUFFER_TYPE_DEPTH_BIT] = depth_params
         })
 end
 
@@ -116,10 +116,10 @@ function M.init()
     M.mtx_light = vmath.matrix4()
     M.light_position = vmath.vector4()
     M.light_constants_dirty = true
-    M.shadow_target_options = { transient = { render.BUFFER_DEPTH_BIT } }
+    M.shadow_target_options = { transient = { graphics.BUFFER_TYPE_DEPTH_BIT } }
     M.shadow_clear_buffers = {
-        [render.BUFFER_COLOR_BIT] = vmath.vector4(1, 1, 1, 1),
-        [render.BUFFER_DEPTH_BIT] = 1
+        [graphics.BUFFER_TYPE_COLOR0_BIT] = vmath.vector4(1, 1, 1, 1),
+        [graphics.BUFFER_TYPE_DEPTH_BIT] = 1
     }
     M.shadow_draw_options = { constants = M.light_constant_buffer }
     M.shadow_depth_constant_buffer = render.constant_buffer()
@@ -158,18 +158,18 @@ function M.render_shadow()
         return
     end
 
-    local w = render.get_render_target_width(light_buffer, render.BUFFER_DEPTH_BIT)
-    local h = render.get_render_target_height(light_buffer, render.BUFFER_DEPTH_BIT)
+    local w = render.get_render_target_width(light_buffer, graphics.BUFFER_TYPE_DEPTH_BIT)
+    local h = render.get_render_target_height(light_buffer, graphics.BUFFER_TYPE_DEPTH_BIT)
 
     render.set_projection(M.light_projection)
     render.set_view(M.light_transform)
     render.set_viewport(0, 0, w, h)
 
     render.set_depth_mask(true)
-    render.set_depth_func(render.COMPARE_FUNC_LEQUAL)
-    render.enable_state(render.STATE_DEPTH_TEST)
-    render.disable_state(render.STATE_BLEND)
-    render.disable_state(render.STATE_CULL_FACE)
+    render.set_depth_func(graphics.COMPARE_FUNC_LEQUAL)
+    render.enable_state(graphics.STATE_DEPTH_TEST)
+    render.disable_state(graphics.STATE_BLEND)
+    render.disable_state(graphics.STATE_CULL_FACE)
 
     -- This is something I would like to do to fix the "peter panning" issue,
     -- but it doesn't really work. Need to flip the normal on the plane I guess.
@@ -191,10 +191,11 @@ end
 
 function M.prerender()
     render.set_color_mask(true, true, true, true)
-    render.set_depth_func(render.COMPARE_FUNC_LEQUAL)
+    render.set_depth_func(graphics.COMPARE_FUNC_LEQUAL)
 end
 
 function M.render_shadow_model(view, proj, frustum)
+    if not proj then return end
     local light_buffer = get_light_buffer()
     local shadows_enabled = light_buffer ~= nil
 
@@ -204,29 +205,29 @@ function M.render_shadow_model(view, proj, frustum)
     M.light_constant_buffer.shadow_pass = vmath.vector4(0, 0, 0, 0)
 
     render.set_projection(proj)
-    render.enable_state(render.STATE_DEPTH_TEST)
-    render.disable_state(render.STATE_STENCIL_TEST)
-    render.disable_state(render.STATE_CULL_FACE)
-    render.set_cull_face(render.FACE_BACK)
+    render.enable_state(graphics.STATE_DEPTH_TEST)
+    render.disable_state(graphics.STATE_STENCIL_TEST)
+    render.disable_state(graphics.STATE_CULL_FACE)
+    render.set_cull_face(graphics.FACE_TYPE_BACK)
 
     render.set_view(view)
     render.set_depth_mask(true)
     if shadows_enabled then
-        render.enable_texture(1, light_buffer, render.BUFFER_COLOR_BIT)
+        render.enable_texture(1, light_buffer, graphics.BUFFER_TYPE_COLOR0_BIT)
     end
     local shadow_options = M.shadow_draw_options
     shadow_options.frustum = frustum
 
     -- The shadow receiver is transparent and must stay before opaque models so it does not darken others.
     if shadows_enabled then
-        render.enable_state(render.STATE_BLEND)
-        render.set_blend_func(render.BLEND_SRC_ALPHA, render.BLEND_ONE_MINUS_SRC_ALPHA)
+        render.enable_state(graphics.STATE_BLEND)
+        render.set_blend_func(graphics.BLEND_FACTOR_SRC_ALPHA, graphics.BLEND_FACTOR_ONE_MINUS_SRC_ALPHA)
         render.draw(M.shadow_surface_pred, shadow_options)
     end
 
     -- Current model textures are fully opaque; disabling blend avoids unnecessary blend work.
     -- Rigid/static models use a render-level tier override so they do not need per-object tier scripts.
-    render.disable_state(render.STATE_BLEND)
+    render.disable_state(graphics.STATE_BLEND)
     render.enable_material(tiers.get_tier_for_material(STATIC_MODEL_MATERIAL_RESOURCE_NAME))
     render.draw(M.shadow_model_pred, shadow_options)
     render.disable_material()
