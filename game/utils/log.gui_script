@@ -10,7 +10,7 @@ function update(self, dt)
 		if not message then
 			break
 		end
-		log(message)
+		log.buffer(message)
 	end
 
 	local text = ""

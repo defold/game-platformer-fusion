@@ -1,0 +1,29 @@
+local context = require("game.context")
+
+function update(self, dt)
+	if not self.start then
+		return
+	end
+	local is_started = fusion.is_started()
+	local is_running = fusion.is_running()
+	local is_connected = fusion.is_connected()
+	local is_in_room = fusion.is_in_room()
+	local is_master = fusion.is_master_client()
+	local player_count = fusion.player_count()
+	local s = ""
+	s = s .. "Connected: " .. (is_connected and "YES" or "NO") .. "\n"
+	s = s .. "Master: " .. (is_master and "YES" or "NO") .. "\n"
+	s = s .. "Running: " .. (is_running and "YES" or "NO") .. "\n"
+	s = s .. "Started: " .. (is_started and "YES" or "NO") .. "\n"
+	s = s .. "In room: " .. (is_in_room and "YES" or "NO") .. "\n"
+	s = s .. "Player Count: " .. player_count .. "\n"
+	s = s .. "Map id: " .. (context.map and context.map or "?") .. "\n"
+	gui.set_text(gui.get_node("info"), s)
+end
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("start") then
+		self.start = true
+	end
+end

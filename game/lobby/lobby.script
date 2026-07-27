@@ -75,6 +75,7 @@ end
 local function start_connect_flow(message)
 	coroutine.wrap(function()
 		fusion.init_from_settings()
+		msg.post("debug", "start")
 		fusion.enable_debug(true)
 		connect(message.username)
 		join_room(message.roomname)

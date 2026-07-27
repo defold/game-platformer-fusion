@@ -1,4 +1,12 @@
 name: "lobby"
+instances {
+  id: "log"
+  prototype: "/game/utils/log.go"
+}
+instances {
+  id: "debug"
+  prototype: "/game/utils/debug.go"
+}
 scale_along_z: 0
 embedded_instances {
   id: "lobby"
