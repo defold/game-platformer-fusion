@@ -4,13 +4,16 @@ function update(self, dt)
 	if not self.start then
 		return
 	end
+	local instance_index = sys.get_config_int("project.instance_index", 1)
 	local is_started = fusion.is_started()
 	local is_running = fusion.is_running()
 	local is_connected = fusion.is_connected()
 	local is_in_room = fusion.is_in_room()
 	local is_master = fusion.is_master_client()
 	local player_count = fusion.player_count()
+	local player_id = fusion.get_local_player_id()
 	local s = ""
+	s = s .. "Instance no: " .. instance_index .. "\n"
 	s = s .. "Connected: " .. (is_connected and "YES" or "NO") .. "\n"
 	s = s .. "Master: " .. (is_master and "YES" or "NO") .. "\n"
 	s = s .. "Running: " .. (is_running and "YES" or "NO") .. "\n"
@@ -18,7 +21,8 @@ function update(self, dt)
 	s = s .. "In room: " .. (is_in_room and "YES" or "NO") .. "\n"
 	s = s .. "Player Count: " .. player_count .. "\n"
 	s = s .. "Map id: " .. (context.map and context.map or "?") .. "\n"
-	gui.set_text(gui.get_node("info"), s)
+	s = s .. "Player id: " .. player_id .. "\n"
+		gui.set_text(gui.get_node("info"), s)
 end
 
 
