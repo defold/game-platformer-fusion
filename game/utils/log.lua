@@ -7,6 +7,9 @@ local _print = _G.print
 local buffer = {}
 
 M.buffer = function(s)
+	if string.sub(s, -1) == "\n" then
+		s = string.sub(s, 1, #s - 1)
+	end
 	table.insert(buffer, 1, s)
 	table.remove(buffer, 100)
 end
