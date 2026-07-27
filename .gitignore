@@ -6,3 +6,5 @@ Thumbs.db
 debug.keystore
 debug.keystore.pass.txt
 log.txt
+instance_1_log.txt
+instance_2_log.txt
