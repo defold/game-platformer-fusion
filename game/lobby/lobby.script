@@ -1,6 +1,7 @@
 local messages = require("game.messages")
 local log = require("game.utils.log")
 local wait = require("game.utils.wait")
+local context = require("game.context")
 
 math.randomseed(socket.gettime() + sys.get_config_int("project.instance_index", 1))
 
@@ -12,6 +13,17 @@ local function connect(username)
 			--msg.post(event.id, fusion.EVENT_OBJECT_OWNER_CHANGED, event)
 		elseif event_id == fusion.EVENT_OBJECT_READY then
 			--msg.post(event.id, fusion.EVENT_OBJECT_READY, event)
+		elseif event_id == fusion.EVENT_MAP_CHANGE then
+			log("EVENT_MAP_CHANGE")
+			pprint(event)
+			local map_id = 0
+			for k,v in pairs(event) do
+				local valid = fusion.map_is_valid(k)
+				if valid then
+					map_id = k
+				end
+			end
+			context.map = map_id
 		else
 			print("Fusion event", event_id)
 		end
@@ -68,6 +80,19 @@ local function start_game()
 	wait.until_true(function()
 		return collectionfactory.get_status(url) == collectionfactory.STATUS_LOADED
 	end)
+
+	if not context.map then
+		if fusion.is_master_client() then
+			local map_id = fusion.map_change("foobar");
+			log("start_game %d", map_id)
+			context.map = map_id
+		else
+			wait.until_true(function()
+				return context.map ~= nil
+			end)		
+		end
+	end
+	
 	local pos = vmath.vector3(0)
 	collectionfactory.create(url, pos)
 end

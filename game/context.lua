@@ -1,6 +1,6 @@
 local M = {}
 
-M.map = 1
+M.map = nil
 M.ui = nil
 M.sounds = nil
 M.local_player = nil
