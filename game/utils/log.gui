@@ -1,0 +1,26 @@
+script: "/game/utils/log.gui_script"
+fonts {
+  name: "default"
+  font: "/builtins/fonts/default.font"
+}
+nodes {
+  position {
+    x: 20.0
+  }
+  scale {
+    x: 0.75
+    y: 0.75
+  }
+  size {
+    x: 600.0
+    y: 800.0
+  }
+  type: TYPE_TEXT
+  text: "<text>"
+  font: "default"
+  id: "log"
+  pivot: PIVOT_SW
+  inherit_alpha: true
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT
