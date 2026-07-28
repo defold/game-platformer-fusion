@@ -1,7 +1,7 @@
 local M = {}
 
 local function is_picked(node, x, y)
-	return gui.is_enabled(node) and gui.pick_node(node, x, y)
+	return gui.is_enabled(node, true) and gui.pick_node(node, x, y)
 end
 
 function M.hide(id)
