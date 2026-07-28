@@ -80,8 +80,8 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == messages.RPC_COIN_COLLECTED then
 		-- the coin authority has confirmed that the coin was collected
 		-- play a sound and tell the player that a coin was collected
-		msg.post(game_context.sounds, messages.COIN_COLLECTED)
-		msg.post(game_context.local_player, messages.COIN_COLLECTED)
+		msg.post(game_context.sounds, messages.SOUND_COIN_COLLECTED)
+		msg.post(game_context.local_player, messages.RPC_COIN_COLLECTED)
 	elseif message_id == messages.RPC_ENABLE then
 		particlefx.play("#coinsparkle")
 		msg.post("#model", "enable")
