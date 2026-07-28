@@ -2,7 +2,6 @@ local game_context = require("game.context")
 local messages = require("game.messages")
 local groups = require("game.groups")
 
-go.property("net_is_grounded", true)
 go.property("net_coins", 0)
 
 local GRAVITY = -0.5

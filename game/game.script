@@ -14,7 +14,7 @@ local function spawn_player()
 	local owner_mode = fusion.OWNERMODE_PLAYERATTACHED
 	local options = {
 		properties = {
-			player = { "net_coins", "net_is_grounded" }
+			player = { "net_coins" }
 		},
 		replication_mode = fusion.REPLICATION_MODE_AUTO,
 	}
