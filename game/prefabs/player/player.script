@@ -86,10 +86,13 @@ function init(self)
 
 	self.original_position = go.get_position()
 	play_animation(self, ANIM_IDLE)
+
+	fusion.subscribe_rpc(messages.RPC_COIN_COLLECTED)
 	fusion.subscribe_rpc(messages.RPC_JUMP)
 end
 
 function final(self)
+	fusion.unsubscribe_rpc(messages.RPC_COIN_COLLECTED)
 	fusion.unsubscribe_rpc(messages.RPC_JUMP)
 end
 
@@ -160,9 +163,10 @@ function on_message(self, message_id, message, sender)
 		else
 			print("player ready - not authority", id, "local player id", player_id, "owner id", fusion.get_owner_id(id))
 		end
-	elseif message_id == messages.COIN_COLLECTED then
+	elseif message_id == messages.RPC_COIN_COLLECTED then
 		self.net_coins = self.net_coins + 1
 		msg.post(game_context.ui, messages.UPDATE_COIN_UI, { amount = self.net_coins })
+		msg.post(game_context.sounds, messages.SOUND_COIN_COLLECTED)
 	elseif message_id == messages.RPC_JUMP then
 		msg.post(game_context.sounds, messages.SOUND_JUMP)
 	end
