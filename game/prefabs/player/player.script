@@ -93,11 +93,13 @@ function init(self)
 
 	fusion.subscribe_rpc(messages.RPC_COIN_COLLECTED)
 	fusion.subscribe_rpc(messages.RPC_JUMP)
+	fusion.subscribe_rpc(messages.RPC_LAND)
 end
 
 function final(self)
 	fusion.unsubscribe_rpc(messages.RPC_COIN_COLLECTED)
 	fusion.unsubscribe_rpc(messages.RPC_JUMP)
+	fusion.unsubscribe_rpc(messages.RPC_LAND)
 end
 
 function update(self, dt)
@@ -153,6 +155,9 @@ function on_message(self, message_id, message, sender)
 			-- check for ground contact
 			-- clear vertical velocity if falling
 			if self.velocity.y <= 0 then
+				if self.velocity.y <= -10 then
+					fusion.send_rpc(0, nil, messages.RPC_LAND)
+				end
 				self.velocity.y = 0
 				self.ground_contact = true
 				self.jump_count = 0
@@ -174,6 +179,8 @@ function on_message(self, message_id, message, sender)
 		msg.post(game_context.sounds, messages.SOUND_COIN_COLLECTED)
 	elseif message_id == messages.RPC_JUMP then
 		msg.post(game_context.sounds, messages.SOUND_JUMP)
+	elseif message_id == messages.RPC_LAND then
+		msg.post(game_context.sounds, messages.SOUND_LAND)
 	end
 end
 

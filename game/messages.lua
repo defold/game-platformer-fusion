@@ -6,6 +6,7 @@ M.RPC_RESPAWN_ALL_PLAYERS = hash("rpc_respawn_all_players")
 M.RPC_ENABLE = hash("rpc_enable")
 M.RPC_DISABLE = hash("rpc_disable")
 M.RPC_JUMP = hash("rpc_jump")
+M.RPC_LAND = hash("rpc_land")
 
 M.COLLISION_RESPONSE = hash("collision_response")
 M.CONTACT_POINT_RESPONSE = hash("contact_point_response")

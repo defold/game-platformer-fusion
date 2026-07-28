@@ -10,5 +10,7 @@ function on_message(self, message_id, message, sender)
 		sound.play("#coin")
 	elseif message_id == messages.SOUND_JUMP then
 		sound.play("#jump")
+	elseif message_id == messages.SOUND_LAND then
+		sound.play("#land")
 	end
 end
