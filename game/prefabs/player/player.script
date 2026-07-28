@@ -59,10 +59,13 @@ local function move(self, value)
 end
 
 local function jump(self, speed)
-	self.velocity.y = speed
-	self.ground_contact = false
-	play_animation(self, ANIM_JUMP_START, go.PLAYBACK_ONCE_FORWARD)
-	fusion.send_rpc(0, nil, messages.RPC_JUMP)
+	if self.jump_count < 2 then
+		self.jump_count = self.jump_count + 1
+		self.velocity.y = speed
+		self.ground_contact = false
+		play_animation(self, ANIM_JUMP_START, go.PLAYBACK_ONCE_FORWARD)
+		fusion.send_rpc(0, nil, messages.RPC_JUMP)
+	end
 end
 
 
@@ -83,6 +86,8 @@ function init(self)
 
 	-- currently played animation
 	self.animation = nil
+
+	self.jump_count = 0
 
 	self.original_position = go.get_position()
 	play_animation(self, ANIM_IDLE)
@@ -151,6 +156,7 @@ function on_message(self, message_id, message, sender)
 			if self.velocity.y <= 0 then
 				self.velocity.y = 0
 				self.ground_contact = true
+				self.jump_count = 0
 			end
 		end
 	elseif message_id == fusion.EVENT_OBJECT_READY then
