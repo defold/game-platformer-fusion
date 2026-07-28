@@ -1,8 +1,10 @@
 local M = {}
 
-M.RPC_COLLECTED = hash("rpc_collected")
-M.RPC_REQUEST_COLLECTED = hash("rpc_request_collect")
+M.RPC_COIN_COLLECTED = hash("rpc_coin_collected")
+M.RPC_REQUEST_COIN_COLLECTED = hash("rpc_request_coin_collect")
 M.RPC_RESPAWN_ALL_PLAYERS = hash("rpc_respawn_all_players")
+M.RPC_ENABLE = hash("rpc_enable")
+M.RPC_DISABLE = hash("rpc_disable")
 
 M.COLLISION_RESPONSE = hash("collision_response")
 M.CONTACT_POINT_RESPONSE = hash("contact_point_response")
