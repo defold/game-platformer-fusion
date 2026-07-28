@@ -1,5 +1,10 @@
 local context = require("game.context")
 
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	msg.post("#", "toggle_log")
+end
+
 function update(self, dt)
 	if not self.start then
 		return
@@ -29,5 +34,16 @@ end
 function on_message(self, message_id, message, sender)
 	if message_id == hash("start") then
 		self.start = true
+	elseif message_id == hash("toggle_log") then
+		local node = gui.get_node("info")
+		gui.set_enabled(node, not gui.is_enabled(node))
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("toggle_log") then
+		if action.pressed then
+			msg.post("#", "toggle_log")
+		end
 	end
 end
