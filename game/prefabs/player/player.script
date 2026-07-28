@@ -62,9 +62,7 @@ local function jump(self, speed)
 	self.velocity.y = speed
 	self.ground_contact = false
 	play_animation(self, ANIM_JUMP_START, go.PLAYBACK_ONCE_FORWARD)
-	if fusion.has_authority() then
-		--realtime.raise_event(false, speed, EVENT_JUMP)
-	end
+	fusion.send_rpc(0, nil, messages.RPC_JUMP)
 end
 
 
@@ -88,9 +86,11 @@ function init(self)
 
 	self.original_position = go.get_position()
 	play_animation(self, ANIM_IDLE)
+	fusion.subscribe_rpc(messages.RPC_JUMP)
 end
 
 function final(self)
+	fusion.unsubscribe_rpc(messages.RPC_JUMP)
 end
 
 function update(self, dt)
@@ -163,6 +163,8 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == messages.COIN_COLLECTED then
 		self.net_coins = self.net_coins + 1
 		msg.post(game_context.ui, messages.UPDATE_COIN_UI, { amount = self.net_coins })
+	elseif message_id == messages.RPC_JUMP then
+		msg.post(game_context.sounds, messages.SOUND_JUMP)
 	end
 end
 
