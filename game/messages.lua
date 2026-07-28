@@ -14,4 +14,8 @@ M.FLAG_REACHED = hash("flag_reached")
 M.SPAWN_PLAYER = hash("spawn_player")
 M.GAME_WINNER_CHANGED = hash("game_winner_changed")
 
+M.SOUND_COIN_COLLECTED = hash("sound_coin_collected")
+M.SOUND_JUMP = hash("sound_jump")
+M.SOUND_LAND = hash("sound_land")
+
 return M

@@ -6,7 +6,9 @@ function init(self)
 end
 
 function on_message(self, message_id, message, sender)
-	if message_id == messages.COIN_COLLECTED then
+	if message_id == messages.SOUND_COIN_COLLECTED then
 		sound.play("#coin")
+	elseif message_id == messages.SOUND_JUMP then
+		sound.play("#jump")
 	end
 end
