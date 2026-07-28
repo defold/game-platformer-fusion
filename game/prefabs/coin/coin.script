@@ -5,42 +5,23 @@ local game_context = require("game.context")
 local messages = require("game.messages")
 local groups = require("game.groups")
 
-go.property("net_active", true)
-
 local COOLDOWN_TIMER_DELAY = 6
-
-
-local function set_active(self, active)
-	self.net_active = active
-	if active then
-		particlefx.play("#coinsparkle")
-		msg.post("#model", "enable")
-		msg.post("#collisionobject", "enable")
-	else
-		particlefx.stop("#coinsparkle")
-		msg.post("#model", "disable")
-		msg.post("#collisionobject", "disable")
-	end
-end
 
 function init(self)
 	local options = {
-		properties = {
-			[msg.url().fragment] = { "net_active" }
-		},
 		replication_mode = fusion.REPLICATION_MODE_NONE
 	}
 	fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
 	
-	fusion.subscribe_rpc(messages.RPC_COLLECTED)
+	fusion.subscribe_rpc(messages.RPC_COIN_COLLECTED)
 
 	self.time = 0
 	self.original_position = go.get_position()
-	set_active(self, true)
+	self.collected = false	
 end
 
 function final(self)
-	fusion.unsubscribe_rpc(messages.RPC_COLLECTED)
+	fusion.unsubscribe_rpc(messages.RPC_COIN_COLLECTED)
 end
 
 function update(self, dt)
@@ -58,42 +39,56 @@ end
 function on_message(self, message_id, message, sender)
 	if message_id == messages.COLLISION_RESPONSE then
 		if message.other_group == groups.PLAYER then
-			print("collide with coin! local player id: ", game_context.local_player, "other id:", message.other_id)
 			if game_context.local_player == message.other_id then
-				-- send rpc to the coin on the owning client
+				-- send request to collect the coin to the owning client
 				local coin_id = go.get_id()
-				local owner_id = fusion.get_owner_id(coin_id)
+				--local owner_id = fusion.get_owner_id(coin_id)
+				local collector_id = fusion.get_local_player_id()
 				local target_player_id = fusion.OBJECT_OWNER_PLAYER_ID
 				local target_object_id = coin_id
-				local data = { collector_id = owner_id, coin_id = coin_id }
-				fusion.send_rpc(target_player_id, target_object_id, messages.RPC_REQUEST_COLLECTED, data)
+				local data = { collector_id = collector_id, coin_id = coin_id }
+				print("SENDING RPC_REQUEST_COIN_COLLECTED")
+				fusion.send_rpc(target_player_id, target_object_id, messages.RPC_REQUEST_COIN_COLLECTED, data)
 
-				-- Even clients without authority will temporarily modify (predict) this networked
-				-- property to have immediate visual feedback. Process method makes sure the coin
-				-- disappears and particle is stopped.
-				--set_active(self, false)
-				msg.post("#collisionobject", "disable")
+				-- clients without authority will predict the result to have immediate
+				-- visual feedback.
+				msg.post("#", messages.RPC_DISABLE)
 			end
 		end
-	elseif message_id == messages.RPC_REQUEST_COLLECTED then
-		print("coin rpc_request_collect")
-		if not self.net_active then
+	elseif message_id == messages.RPC_REQUEST_COIN_COLLECTED then
+		-- this is received by the client which has authority, ie is the owner of
+		-- the coin, in this case the master client
+		if self.collected then
+			-- the coin was already collected by someone else
 			return
 		end
 
-		set_active(self, false)
+		-- flag that the coin was collected and start a timer to
+		-- reactivate the coin
+		self.collected = true
 		timer.delay(COOLDOWN_TIMER_DELAY, false, function()
-			set_active(self, true)
+			self.collected = false
+			-- broadcast to the coin that it should be enabled
+			fusion.send_rpc(0, go.get_id(), messages.RPC_ENABLE)
 		end)
-		-- send to the player who collected the coin
-		fusion.send_rpc(message.data.collector_id, go.get_id(), messages.RPC_COLLECTED)
-	elseif message_id == messages.RPC_COLLECTED then
-		msg.post(game_context.local_player, messages.COIN_COLLECTED)
+
+		-- send confirmation back to the coin that it was collected
+		fusion.send_rpc(message.data.collector_id, go.get_id(), messages.RPC_COIN_COLLECTED)
+
+		-- broadcast to the coin that it should be disabled
+		fusion.send_rpc(0, go.get_id(), messages.RPC_DISABLE)
+	elseif message_id == messages.RPC_COIN_COLLECTED then
+		-- the coin authority has confirmed that the coin was collected
+		-- play a sound and tell the player that a coin was collected
 		msg.post(game_context.sounds, messages.COIN_COLLECTED)
-	elseif message_id == fusion.EVENT_OBJECT_READY then
-		--print("coin is ready", go.get_id(), "my owner is", fusion.get_owner_id())
-	elseif message_id == fusion.EVENT_OBJECT_OWNER_CHANGED then
-		print("coin owner changed")
-		pprint(message)
+		msg.post(game_context.local_player, messages.COIN_COLLECTED)
+	elseif message_id == messages.RPC_ENABLE then
+		particlefx.play("#coinsparkle")
+		msg.post("#model", "enable")
+		msg.post("#collisionobject", "enable")
+	elseif message_id == messages.RPC_DISABLE then
+		particlefx.stop("#coinsparkle")
+		msg.post("#model", "disable")
+		msg.post("#collisionobject", "disable")
 	end
 end
