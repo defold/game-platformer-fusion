@@ -14,12 +14,13 @@ local FALL_SPEED = 30
 local FALL_GRAVITY = 25
 
 
-local function enable_collsions(self)
-	self.collsions_enabled = true
+local function enable_collisions(self)
+	self.collisions_enabled = true
 	msg.post("#collisionobject", "enable")
 end
+
 local function disable_collisions(self)
-	self.collsions_enabled = false
+	self.collisions_enabled = false
 	msg.post("#collisionobject", "disable")
 end
 
@@ -112,7 +113,7 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == fusion.EVENT_OBJECT_READY then
-		enable_collsions(self)
+		enable_collisions(self)
 	elseif message_id == messages.COLLISION_RESPONSE then
 		if message.other_group == groups.PLAYER then
 			-- Platforms falling is initiated only on state authority
