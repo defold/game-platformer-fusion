@@ -19,7 +19,7 @@ local function spawn_player()
 		replication_mode = fusion.REPLICATION_MODE_AUTO,
 	}
 	local id = fusion.spawn("#playerfactory", pos, rot, map, owner_mode, options)
-	log("spawned player with id %s", id)
+	log("spawned player with id %s", tostring(id))
 	msg.post(game_context.camera, "follow", { url = id })
 end
 
