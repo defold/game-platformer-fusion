@@ -99,9 +99,9 @@ function update(self, dt)
 		is_active = self.net_is_active
 	end
 
-	
-	if is_active ~= self.is_falling
-	and self.collisions_enabled ~= is_active then
+	local should_be_falling = not is_active
+	if should_be_falling == self.is_falling
+	and self.collisions_enabled == is_active then
 		return -- No change
 	end
 
@@ -109,9 +109,11 @@ function update(self, dt)
 		self.is_falling = false
 		self.fall_velocity = 0
 		go.set_position(self.original_position)
+		enable_collisions(self)
 	else
 		self.is_falling = true
 		self.fall_velocity = FALL_SPEED
+		disable_collisions(self)
 	end
 end
 
