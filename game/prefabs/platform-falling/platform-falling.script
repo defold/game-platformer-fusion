@@ -39,6 +39,7 @@ function init(self)
 	fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
 
 	self.original_position = go.get_position()
+	self.is_ready = false
 	self.is_falling = false
 	self.fall_velocity = 0
 	disable_collisions(self)
@@ -72,6 +73,10 @@ local function update_state(self)
 end
 
 function update(self, dt)
+	if not self.is_ready then
+		return
+	end
+
 	update_state(self)
 
 	if self.is_falling then
@@ -113,6 +118,7 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == fusion.EVENT_OBJECT_READY then
+		self.is_ready = true
 		enable_collisions(self)
 	elseif message_id == messages.COLLISION_RESPONSE then
 		if message.other_group == groups.PLAYER then
