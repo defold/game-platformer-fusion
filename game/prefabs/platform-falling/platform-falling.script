@@ -120,6 +120,10 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == fusion.EVENT_OBJECT_READY then
+		if fusion.has_authority() then
+			self.net_is_active = true
+			self.net_cooldown_finish_time = 0
+		end
 		self.is_ready = true
 		enable_collisions(self)
 	elseif message_id == messages.COLLISION_RESPONSE then
