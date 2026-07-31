@@ -27,6 +27,7 @@ function update(self, dt)
 	s = s .. "Player Count: " .. player_count .. "\n"
 	s = s .. "Map id: " .. (context.map and context.map or "?") .. "\n"
 	s = s .. "Player id: " .. player_id .. "\n"
+	s = s .. "Network time: " .. ("%.2f"):format(fusion.get_network_time()) .. "\n"
 		gui.set_text(gui.get_node("info"), s)
 end
 
