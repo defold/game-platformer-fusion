@@ -99,8 +99,7 @@ function update(self, dt)
 		is_active = self.net_is_active
 	end
 
-	local should_be_falling = not is_active
-	if should_be_falling == self.is_falling
+	if is_active == not self.is_falling
 	and self.collisions_enabled == is_active then
 		return -- No change
 	end
@@ -120,6 +119,9 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == fusion.EVENT_OBJECT_READY then
+		-- Establish the initial state explicitly on the authority. In particular,
+		-- do not depend on the map object's initial buffer values being applied
+		-- before the ready message on every platform.
 		if fusion.has_authority() then
 			self.net_is_active = true
 			self.net_cooldown_finish_time = 0
