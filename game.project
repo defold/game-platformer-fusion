@@ -1,6 +1,7 @@
 [project]
 title = FusionPlatformer
 write_log_file = 1
+dependencies#0 = https://github.com/defold/extension-photon-fusion/archive/refs/heads/master.zip
 
 [bootstrap]
 main_collection = /game/lobby/lobby.collectionc
