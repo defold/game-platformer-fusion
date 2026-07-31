@@ -1,5 +1,5 @@
 [project]
-title = Blitz Buddies
+title = FusionPlatformer
 write_log_file = 1
 
 [bootstrap]
@@ -52,6 +52,9 @@ gravity_y = -40.0
 
 [model]
 max_count = 1024
+
+[fusion]
+app_id = 3824d2ca-0781-4d36-bf31-fc6f09919434
 
 [render]
 clear_color_red = 0.3
