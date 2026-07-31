@@ -252,4 +252,5 @@ app_manifest = /game.appmanifest
 app_id = 3824d2ca-0781-4d36-bf31-fc6f09919434
 app_version = 1.0
 default_region = eu
+use_wss = 1
 
