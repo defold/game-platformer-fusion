@@ -1,4 +1,9 @@
 local log = require("game.utils.log")
+local settings = require("game.settings")
+
+-------------------------------
+-- Defold lifecycle functions:
+-------------------------------
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
@@ -6,12 +11,14 @@ function init(self)
 end
 
 function update(self, dt)
-	while true do
-		local message = fusion.pop_log_event()
-		if not message then
-			break
+	if not settings.LOCAL_PLATFORMER and settings.FUSION_AVAILABLE then
+		while true do
+			local message = fusion.pop_log_event()
+			if not message then
+				break
+			end
+			log.buffer(message)
 		end
-		log.buffer(message)
 	end
 
 	local text = ""

@@ -1,6 +1,6 @@
 name: "model"
 tags: "shadow_model"
-vertex_program: "/shadow_mapping/materials/standard_instanced.vp"
+vertex_program: "/shadow_mapping/materials/light_instanced.vp"
 fragment_program: "/shadow_mapping/materials/low/diffuse.fp"
 vertex_space: VERTEX_SPACE_LOCAL
 vertex_constants {
@@ -12,13 +12,9 @@ vertex_constants {
   type: CONSTANT_TYPE_PROJECTION
 }
 vertex_constants {
-  name: "light"
-  type: CONSTANT_TYPE_USER
+  name: "mtx_shadow"
+  type: CONSTANT_TYPE_USER_MATRIX4
   value {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-    w: 1.0
   }
 }
 samplers {

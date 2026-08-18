@@ -3,6 +3,10 @@ components {
   component: "/game/prefabs/coin/coinsparkle.particlefx"
 }
 components {
+  id: "coincollect"
+  component: "/game/prefabs/coin/coincollect.particlefx"
+}
+components {
   id: "coin"
   component: "/game/prefabs/coin/coin.script"
 }

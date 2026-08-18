@@ -1,40 +1,87 @@
 local game_context = require("game.context")
 local messages = require("game.messages")
 local log = require("game.utils.log")
+local settings = require("game.settings")
 
 go.property("net_winner", 0)
 
 local MIN_COINS_TO_WIN = 15
+local NO_WINNER = -1
 
+---@class GameState
+---@field net_winner number Replicated Fusion player id, or zero between rounds.
+---@field displayed_winner number|nil Last winner value sent to the local GUI.
+
+---Spawns the player using the ownership model selected for the session.
 local function spawn_player()
 	log("spawn player")
-	local pos = vmath.vector3(0,3,0)
-	local rot = nil
+	local position = vmath.vector3(0, 3, 0)
 	local map = 1
-	local owner_mode = fusion.OWNERMODE_PLAYERATTACHED
-	local options = {
-		properties = {
-			player = { "net_coins" }
-		},
-		replication_mode = fusion.REPLICATION_MODE_AUTO,
-	}
-	local id = fusion.spawn("#playerfactory", pos, rot, map, owner_mode, options)
+	local id
+	if settings.LOCAL_PLATFORMER then
+		id = factory.create("#playerfactory", position)
+	else
+		local owner_mode = fusion.OWNERMODE_PLAYERATTACHED
+		local options = {
+			properties = {
+				player = { "net_coins", "net_animation_state", "net_visual_variant" }
+			},
+			replication_mode = fusion.REPLICATION_MODE_AUTO,
+		}
+		id = fusion.spawn("#playerfactory", position, nil, map, owner_mode, options)
+	end
 	log("spawned player with id %s", tostring(id))
-	msg.post(game_context.camera, "follow", { url = id })
 end
 
-function init(self)
-	print("init game")
-	game_context.game = msg.url()
+---Resets only the player owned by this process.
+local function reset_local_player()
+	msg.post(game_context.local_player, messages.RESET_PLAYER)
+end
 
-	local options = {
-		properties = {
-			[msg.url().fragment] = { "net_winner" }
-		},
-		replication_mode = fusion.REPLICATION_MODE_NONE
-	}
-	fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
-	spawn_player()
+---Forwards replicated winner changes to the local, message-driven GUI.
+---@param self GameState
+local function update_winner_ui(self)
+	local winner = self.net_winner > 0 and self.net_winner or -1
+	if self.displayed_winner ~= winner then
+		self.displayed_winner = winner
+		msg.post(game_context.ui, messages.GAME_WINNER_CHANGED, { winner = winner })
+	end
+end
+
+-------------------------------
+-- Defold lifecycle functions:
+-------------------------------
+
+function init(self)
+	game_context.game = msg.url()
+	self.displayed_winner = nil
+	msg.post("#ui", messages.SET_GAME_GOAL, { coin_goal = MIN_COINS_TO_WIN })
+
+	if not settings.LOCAL_PLATFORMER then
+		-- The master client owns the winner property, while every client observes
+		-- the same map object and updates its own GUI from the replicated value.
+		local options = {
+			properties = {
+				[msg.url().fragment] = { "net_winner" }
+			},
+			replication_mode = fusion.REPLICATION_MODE_NONE
+		}
+		fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
+		fusion.subscribe_rpc(messages.RPC_RESPAWN_ALL_PLAYERS)
+	end
+	timer.delay(0.0, false, function()
+		spawn_player()
+	end)
+end
+
+function final(self)
+	if not settings.LOCAL_PLATFORMER then
+		fusion.unsubscribe_rpc(messages.RPC_RESPAWN_ALL_PLAYERS)
+	end
+end
+
+function update(self, dt)
+	update_winner_ui(self)
 end
 
 function on_message(self, message_id, message, sender)
@@ -50,14 +97,18 @@ function on_message(self, message_id, message, sender)
 			-- someone else won first
 			return
 		end
-		
-		self.net_winner = fusion.get_owner_id(message.player_id)
 
-		msg.post(game_context.ui, messages.GAME_WINNER_CHANGED, { winner = self.net_winner })
+		self.net_winner = settings.LOCAL_PLATFORMER and 1 or fusion.get_owner_id(message.player_id)
 
 		timer.delay(5, false, function()
-			self.net_winner = -1
-			fusion.send_rpc(0, nil, messages.RPC_RESPAWN_ALL_PLAYERS, {})
+			self.net_winner = 0
+			if settings.LOCAL_PLATFORMER then
+				reset_local_player()
+			else
+				fusion.send_rpc(0, nil, messages.RPC_RESPAWN_ALL_PLAYERS, {})
+			end
 		end)
+	elseif message_id == messages.RPC_RESPAWN_ALL_PLAYERS then
+		reset_local_player()
 	end
 end

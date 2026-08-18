@@ -1,14 +1,33 @@
 local context = require("game.context")
 
+local UPDATE_INTERVAL = 0.25
+
+-------------------------------
+-- Defold lifecycle functions:
+-------------------------------
+
 function init(self)
 	msg.post(".", "acquire_input_focus")
 	msg.post("#", "toggle_log")
+	self.update_timer = 0.0
 end
 
 function update(self, dt)
 	if not self.start then
 		return
 	end
+
+	local info_node = gui.get_node("info")
+	if not gui.is_enabled(info_node) then
+		return
+	end
+
+	self.update_timer = self.update_timer - dt
+	if self.update_timer > 0.0 then
+		return
+	end
+	self.update_timer = UPDATE_INTERVAL
+
 	local instance_index = sys.get_config_int("project.instance_index", 1)
 	local is_started = fusion.is_started()
 	local is_running = fusion.is_running()
@@ -28,9 +47,8 @@ function update(self, dt)
 	s = s .. "Map id: " .. (context.map and context.map or "?") .. "\n"
 	s = s .. "Player id: " .. player_id .. "\n"
 	s = s .. "Network time: " .. ("%.2f"):format(fusion.get_network_time()) .. "\n"
-		gui.set_text(gui.get_node("info"), s)
+	gui.set_text(info_node, s)
 end
-
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("start") then
@@ -38,6 +56,7 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == hash("toggle_log") then
 		local node = gui.get_node("info")
 		gui.set_enabled(node, not gui.is_enabled(node))
+		self.update_timer = 0.0
 	end
 end
 

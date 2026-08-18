@@ -27,12 +27,33 @@ embedded_instances {
   ""
 }
 embedded_instances {
-  id: "camera"
+  id: "camera_operator"
+  children: "camera_offset"
   data: "components {\n"
   "  id: \"camera_follow\"\n"
   "  component: \"/game/camera_follow.script\"\n"
   "}\n"
-  "embedded_components {\n"
+  ""
+  position {
+    y: 5.0
+  }
+  rotation {
+    y: 1.0
+    w: 6.123234E-17
+  }
+}
+embedded_instances {
+  id: "camera_offset"
+  children: "camera"
+  data: ""
+  rotation {
+    x: -0.34202015
+    w: 0.9396926
+  }
+}
+embedded_instances {
+  id: "camera"
+  data: "embedded_components {\n"
   "  id: \"camera\"\n"
   "  type: \"camera\"\n"
   "  data: \"aspect_ratio: 1.0\\n"
@@ -44,12 +65,6 @@ embedded_instances {
   "}\n"
   ""
   position {
-    x: 3.0
-    y: 10.0
-    z: 5.0
-  }
-  rotation {
-    x: -0.17364818
-    w: 0.9848077
+    z: 9.0
   }
 }

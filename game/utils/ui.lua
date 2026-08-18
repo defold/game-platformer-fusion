@@ -1,18 +1,29 @@
 local M = {}
 
+---@class GuiInputState
+---@field input node|nil Text node that currently owns keyboard input.
+---@field pressed node|nil Node pressed by the current pointer gesture.
+
+---@param node node
+---@param x number
+---@param y number
+---@return boolean
 local function is_picked(node, x, y)
 	return gui.is_enabled(node, true) and gui.pick_node(node, x, y)
 end
 
+---@param id string|hash
 function M.hide(id)
 	gui.set_enabled(gui.get_node(id), false)
 end
 
-function M.show(id)
-	gui.set_enabled(gui.get_node(id), true)
-end
-
-function M.input(self, id, action_id, action, callback)
+---Updates one text field and returns its current value.
+---@param self GuiInputState
+---@param id string|hash
+---@param action_id hash|nil
+---@param action table
+---@return string
+function M.input(self, id, action_id, action)
 	local node = gui.get_node(id)
 	if action.x and action.y then
 		if action.pressed then
@@ -45,7 +56,11 @@ function M.input(self, id, action_id, action, callback)
 	return text
 end
 
-function M.button(self, id, action, callback)
+---@param self GuiInputState
+---@param id string|hash
+---@param action table
+---@return boolean|nil
+function M.button(self, id, action)
 	if not action.x or not action.y then
 		return
 	end
@@ -59,21 +74,16 @@ function M.button(self, id, action, callback)
 	end
 
 	local node = gui.get_node(id)
-	if is_picked(node, action.x, action.y) then 
+	if is_picked(node, action.x, action.y) then
 		if action.pressed then
 			gui.set_scale(node, vmath.vector4(1.05))
 			self.pressed = node
 		elseif action.released then
 			if self.pressed then
 				gui.set_scale(self.pressed, vmath.vector4(1.0))
-				if node == self.pressed then
-					if callback then
-						callback(self, action)
-					else
-						return true
-					end
-				end
+				local clicked = node == self.pressed
 				self.pressed = nil
+				return clicked
 			end
 		end
 	end

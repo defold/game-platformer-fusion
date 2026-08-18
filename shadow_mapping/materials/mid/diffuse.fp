@@ -1,31 +1,48 @@
 #version 140
 
 in highp vec4 var_position;
-in highp vec3 var_normal;
-in highp vec2 var_texcoord0;
-in highp vec4 var_texcoord0_shadow;
-in highp vec4 var_light;
+in mediump vec3 var_normal;
+in mediump vec2 var_texcoord0;
+in highp mat4 var_view;
+in highp vec4 var_shadow_coord;
 
 out vec4 out_fragColor;
 
-uniform highp sampler2D tex0;
-uniform highp sampler2D tex_depth;
+uniform mediump sampler2D tex0;
+uniform highp sampler2D shadow_map;
 
-#include "/shadow_mapping/materials/mid/shadows_mid.glsl"
+// x: render depth caster pass, y: receive directional shadows.
+uniform fs_uniforms
+{
+	highp vec4 shadow_pass;
+	highp vec4 shadow_texel_size;
+	highp vec4 shadow_params;
+};
+
+#define MAX_LIGHT_COUNT 8
+#include "/builtins/materials/lighting.glsl"
+#include "/shadow_mapping/materials/directional_shadows.glsl"
+#include "/shadow_mapping/materials/shadowed_lighting.glsl"
 
 void main()
 {
-    vec4 color = texture(tex0, var_texcoord0.xy);
-    
-    // Diffuse light calculations.
-    vec3 ambient_light = vec3(0.3);
-    vec3 diff_light    = vec3(normalize(var_light.xyz - var_position.xyz));
-    diff_light         = max(dot(var_normal,diff_light), 0.0) + ambient_light;
-    diff_light         = clamp(diff_light, 0.6, 1.0);
+	vec4 color = texture(tex0, var_texcoord0);
+	if (shadow_pass.x > 0.5)
+	{
+		if (color.a < 0.1)
+		{
+			discard;
+		}
+		out_fragColor = vec4(1.0);
+		return;
+	}
 
-    vec4 depth_proj    = var_texcoord0_shadow / var_texcoord0_shadow.w;
-    float shadow_value = shadow_calculation(depth_proj.xyz);
-    vec3 color_out     = color.rgb * diff_light;
-    color_out          = mix(color_out * 0.75, color_out, shadow_value);
-    out_fragColor      = vec4(color_out,1.0) * color.w;
+	vec3 view_normal = normalize(var_normal);
+	vec3 diffuse_light = diffuse_lambert(view_normal, var_position.xyz);
+	if (shadow_pass.y > 0.5)
+	{
+		diffuse_light = shadowed_diffuse_lambert(view_normal, var_position.xyz);
+	}
+	vec3 lighting = ambient_light() + diffuse_light;
+	out_fragColor = vec4(color.rgb * lighting, color.a);
 }

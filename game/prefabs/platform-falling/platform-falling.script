@@ -4,67 +4,115 @@
 local game_context = require("game.context")
 local messages = require("game.messages")
 local groups = require("game.groups")
+local settings = require("game.settings")
 
 go.property("net_cooldown_finish_time", 0)
 go.property("net_is_active", true)
 
-local FALL_DELAY = 0.2
+local FALL_DELAY = 1.0
 local REACTIVATION_DELAY = 1.0
 local FALL_SPEED = 30
 local FALL_GRAVITY = 25
+local SHAKE_FREQUENCY = 55.0
+local SHAKE_AMPLITUDE = 0.045
 
+local ZERO_OFFSET = vmath.vector3()
 
+---@class FallingPlatformState
+---@field net_cooldown_finish_time number Replicated absolute network deadline.
+---@field net_is_active boolean Replicated authority state before prediction.
+---@field original_position vector3
+---@field visual_id hash
+---@field local_time number Offline replacement for Fusion network time.
+---@field shake_time number
+---@field visual_has_offset boolean
+---@field is_ready boolean
+---@field is_falling boolean
+---@field fall_velocity number
+---@field collisions_enabled boolean
+
+---@param self FallingPlatformState
 local function enable_collisions(self)
 	self.collisions_enabled = true
 	msg.post("#collisionobject", "enable")
 end
 
+---@param self FallingPlatformState
 local function disable_collisions(self)
 	self.collisions_enabled = false
 	msg.post("#collisionobject", "disable")
 end
 
+---Returns the shared Fusion clock, or the fixed-step clock in offline mode.
+---@param self FallingPlatformState
+---@return number
+local function get_time(self)
+	if settings.LOCAL_PLATFORMER then
+		return self.local_time
+	end
+	return fusion.get_network_time()
+end
+
+---@param self FallingPlatformState
+---@return boolean
 local function has_cooldown_expired(self)
 	return self.net_cooldown_finish_time > 0
-	   and fusion.get_network_time() > self.net_cooldown_finish_time
+	   and get_time(self) > self.net_cooldown_finish_time
 end
 
-function init(self)
-	local options = {
-		properties = {
-			[msg.url().fragment] = { "net_cooldown_finish_time", "net_is_active" }
-		},
-		replication_mode = fusion.REPLICATION_MODE_NONE,
-	}
-	fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
-
-	self.original_position = go.get_position()
-	self.is_ready = false
-	self.is_falling = false
-	self.fall_velocity = 0
-	disable_collisions(self)
+---@param self FallingPlatformState
+---@return boolean
+local function should_shake(self)
+	return self.is_ready
+		and not self.is_falling
+		and self.net_is_active
+		and self.net_cooldown_finish_time > 0
+		and get_time(self) < self.net_cooldown_finish_time
 end
 
-local function update_state(self)
-	-- Only state authority can change state
-	if not fusion.has_authority() then
+---@param self FallingPlatformState
+---@param dt number
+local function update_visual_shake(self, dt)
+	if not should_shake(self) then
+		self.shake_time = 0.0
+		if self.visual_has_offset then
+			go.set_position(ZERO_OFFSET, self.visual_id)
+			self.visual_has_offset = false
+		end
 		return
 	end
 
-	-- Cooldown not set
+	self.shake_time = self.shake_time + dt
+	local progress = math.min(1.0, self.shake_time / FALL_DELAY)
+	local amplitude = SHAKE_AMPLITUDE * (0.35 + progress * 0.65)
+	local offset = vmath.vector3(
+		math.sin(self.shake_time * SHAKE_FREQUENCY) * amplitude,
+		0.0,
+		math.cos(self.shake_time * SHAKE_FREQUENCY * 0.83) * amplitude
+	)
+	go.set_position(offset, self.visual_id)
+	self.visual_has_offset = true
+end
+
+---Advances the replicated cooldown state on the platform authority.
+---@param self FallingPlatformState
+local function update_state(self)
+	if not settings.LOCAL_PLATFORMER and not fusion.has_authority() then
+		return
+	end
+
 	if self.net_cooldown_finish_time <= 0 then
 		return
 	end
 
-	-- Cooldown not finished
-	if fusion.get_network_time() < self.net_cooldown_finish_time then
+	if get_time(self) < self.net_cooldown_finish_time then
 		return
 	end
 
 	if self.net_is_active then
 		-- Schedule reactivation
 		self.net_is_active = false
-		self.net_cooldown_finish_time = fusion.get_network_time() + REACTIVATION_DELAY
+		self.net_cooldown_finish_time = get_time(self) + REACTIVATION_DELAY
 	else
 		-- Platform is active again
 		self.net_is_active = true
@@ -72,7 +120,51 @@ local function update_state(self)
 	end
 end
 
+-------------------------------
+-- Defold lifecycle functions:
+-------------------------------
+
+function init(self)
+	if not settings.LOCAL_PLATFORMER then
+		local options = {
+			properties = {
+				[msg.url().fragment] = { "net_cooldown_finish_time", "net_is_active" }
+			},
+			replication_mode = fusion.REPLICATION_MODE_NONE,
+		}
+		fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
+	end
+
+	self.original_position = go.get_position()
+	go.update_world_transform()
+	self.visual_id = factory.create("#visual_factory", go.get_world_position(), go.get_world_rotation())
+	go.set_parent(self.visual_id, go.get_id(), true)
+	self.local_time = 0
+	self.shake_time = 0.0
+	self.visual_has_offset = false
+	self.is_ready = settings.LOCAL_PLATFORMER
+	self.is_falling = false
+	self.fall_velocity = 0
+	if settings.LOCAL_PLATFORMER then
+		enable_collisions(self)
+	else
+		disable_collisions(self)
+	end
+end
+
+function final(self)
+	go.delete(self.visual_id)
+end
+
 function update(self, dt)
+	update_visual_shake(self, dt)
+end
+
+function fixed_update(self, dt)
+	if settings.LOCAL_PLATFORMER then
+		self.local_time = self.local_time + dt
+	end
+
 	if not self.is_ready then
 		return
 	end
@@ -86,12 +178,9 @@ function update(self, dt)
 		go.set_position(pos)
 	end
 
-	-- We are not waiting until net_is_active state comes from state authority
-	-- but we estimate the current correct state based on the cooldown expiration.
-	-- This ensures that clients don't have an advantage (otherwise their time to
-	-- jump before the platform falls would be fall_delay + ping).
-	-- Invert authority state when local cooldown expired — this is client-side prediction
-	-- so the platform falls immediately without waiting for the network round-trip.
+	-- The replicated deadline lets every client predict the next state against
+	-- the same network clock. This removes an extra ping from the visible fall
+	-- without giving non-authority clients permission to write replicated state.
 	local is_active
 	if has_cooldown_expired(self) then
 		is_active = not self.net_is_active
@@ -116,9 +205,8 @@ function update(self, dt)
 	end
 end
 
-
 function on_message(self, message_id, message, sender)
-	if message_id == fusion.EVENT_OBJECT_READY then
+	if not settings.LOCAL_PLATFORMER and message_id == fusion.EVENT_OBJECT_READY then
 		-- Establish the initial state explicitly on the authority. In particular,
 		-- do not depend on the map object's initial buffer values being applied
 		-- before the ready message on every platform.
@@ -130,8 +218,7 @@ function on_message(self, message_id, message, sender)
 		enable_collisions(self)
 	elseif message_id == messages.COLLISION_RESPONSE then
 		if message.other_group == groups.PLAYER then
-			-- Platforms falling is initiated only on state authority
-			if not fusion.has_authority() then
+			if not settings.LOCAL_PLATFORMER and not fusion.has_authority() then
 				return
 			end
 
@@ -144,7 +231,7 @@ function on_message(self, message_id, message, sender)
 			end
 
 			-- Start the fall delay cooldown
-			self.net_cooldown_finish_time = fusion.get_network_time() + FALL_DELAY
+			self.net_cooldown_finish_time = get_time(self) + FALL_DELAY
 		end
 	end
 end

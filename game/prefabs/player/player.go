@@ -2,25 +2,6 @@ components {
   id: "player"
   component: "/game/prefabs/player/player.script"
 }
-components {
-  id: "model_tiers"
-  component: "/shadow_mapping/model_tiers.script"
-  properties {
-    id: "low_material"
-    value: "/shadow_mapping/materials/low/diffuse_skinning.material"
-    type: PROPERTY_TYPE_HASH
-  }
-  properties {
-    id: "mid_material"
-    value: "/shadow_mapping/materials/mid/diffuse_skinning.material"
-    type: PROPERTY_TYPE_HASH
-  }
-  properties {
-    id: "high_material"
-    value: "/shadow_mapping/materials/high/diffuse_skinning.material"
-    type: PROPERTY_TYPE_HASH
-  }
-}
 embedded_components {
   id: "collisionobject"
   type: "collisionobject"
@@ -45,28 +26,17 @@ embedded_components {
   "  }\n"
   "  data: 0.5\n"
   "}\n"
-  "linear_damping: 0.9\n"
   ""
 }
 embedded_components {
-  id: "model"
-  type: "model"
-  data: "mesh: \"/assets/models/kenney_platformer-kit/character-oobi.glb\"\n"
-  "skeleton: \"/assets/models/kenney_platformer-kit/character-oobi.glb\"\n"
-  "animations: \"/assets/models/kenney_platformer-kit/character-oobi.glb\"\n"
-  "default_animation: \"idle\"\n"
-  "name: \"{{NAME}}\"\n"
-  "materials {\n"
-  "  name: \"colormap\"\n"
-  "  material: \"/shadow_mapping/materials/high/diffuse_skinning.material\"\n"
-  "  textures {\n"
-  "    sampler: \"tex0\"\n"
-  "    texture: \"/assets/models/kenney_platformer-kit/Textures/colormap.png\"\n"
-  "  }\n"
-  "  textures {\n"
-  "    sampler: \"tex_depth\"\n"
-  "    texture: \"/assets/models/kenney_platformer-kit/Textures/colormap.png\"\n"
-  "  }\n"
-  "}\n"
+  id: "dust_factory"
+  type: "factory"
+  data: "prototype: \"/game/prefabs/effects/dust.go\"\n"
+  ""
+}
+embedded_components {
+  id: "objectinterpolation"
+  type: "objectinterpolation"
+  data: "apply_transform: APPLY_TRANSFORM_NONE\n"
   ""
 }
