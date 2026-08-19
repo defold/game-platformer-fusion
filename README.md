@@ -107,3 +107,7 @@ Falling platforms use a replicated deadline based on Fusion's network time. Ever
 ## Winning and starting the next round
 
 The master client handles flag collisions and checks the player's confirmed `net_coins` value. When the requirement is met, it sets `net_winner`, waits five seconds, clears the winner, and broadcasts `RPC_RESPAWN_ALL_PLAYERS`. Each client responds by resetting the player it owns.
+
+## Credits
+
+Assets used in the project by [Kenney](https://kenney.nl/assets/)
