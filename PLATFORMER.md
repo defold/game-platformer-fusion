@@ -21,14 +21,14 @@ The player game object holds:
 - an `objectinterpolation` component for interpolating the position,
 - a `player` script that handles input, collisions, and movement logic.
 
-![Player game object](player.png)
+![Player game object](img/player.png)
 
 The player's visuals (3D models) are managed by a separate `player_visual_factories` game object, which holds:
 
 - a `player_visuals_factories` script responsible for spawning the selected model,
 - five factories containing different models.
 
-![Player visual factories and game objects](player_visuals.png)
+![Player visual factories and game objects](img/player_visuals.png)
 
 ## Character movement
 
@@ -52,7 +52,7 @@ Respawning updates the player root and the interpolation component's stored posi
 
 The camera uses a small game object hierarchy in the lobby collection (the bootstrap collection):
 
-![Camera game object hierarchy in the lobby collection](camera.png)
+![Camera game object hierarchy in the lobby collection](img/camera.png)
 
 ```text
 camera_operator       follow target position and horizontal rotation
@@ -82,13 +82,13 @@ The skybox is based on Defold's [Skybox example](https://defold.com/examples/mod
 
 The camera-facing visuals (the star particle effects around coins) follow the [Billboarding example](https://defold.com/examples/material/billboarding/).
 
-![Particles using the billboarding material](particles.png)
+![Particles using the billboarding material](img/particles.png)
 
 ### Directional lighting and shadows
 
 The custom pipeline under `shadow_mapping/` first renders a depth map from the directional light, then samples it while drawing static and GPU-skinned models. Both model types cast and receive shadows.
 
-![Shadow camera and level setup](shadow_camera.png)
+![Shadow camera and level setup](img/shadow_camera.png)
 
 The orthographic `shadow_camera` component on the `shadows` game object is required because it supplies the light-space view and projection matrices. Its **Orthographic Zoom**, **Near Z**, and **Far Z** values are the runtime source of truth for the shadow volume. `shadow_setup.script` follows the local player's interpolated visual, centers it between the near and far planes, and snaps the camera position to the active shadow map's texel grid. Shadow-map resolutions, PCF, polygon offset, and receiver bias remain properties of that script.
 

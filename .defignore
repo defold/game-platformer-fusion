@@ -1,1 +1,5 @@
 /.deps
+
+/.defold/api
+/.idea
+/.vscode

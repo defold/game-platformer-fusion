@@ -18,13 +18,13 @@ Online play requires a Photon Fusion App ID.
 
 3. Enter the App ID from the Photon dashboard in the `App Id` field.
 
-![Fusion App ID setting](game_project_fusion_settings.png)
+![Fusion App ID setting](img/game_project_fusion_settings.png)
 
 ## Build the HTML5 version
 
 If Fusion is unavailable, the App ID is missing, or the game is run from a local build (`Project` -> `Build`), the login screen will show:
 
-![Fusion Unavailable](fusion_unavailable.png)
+![Fusion Unavailable](img/fusion_unavailable.png)
 
 You can still run the game offline by clicking the `PLAY OFFLINE` button.
 
@@ -44,7 +44,7 @@ After rebuilding, restart the HTTP server in the new bundle directory and hard-r
 
 If Fusion is available and an App ID is configured, the login screen will show:
 
-![Fusion Available](fusion_available.png)
+![Fusion Available](img/fusion_available.png)
 
 Enter a room name to join or create that room. To connect from another client, enter the same room name. A username is generated randomly each time.
 
@@ -54,7 +54,7 @@ Each game client connects to Photon Cloud using the App ID compiled into the bun
 
 Press the <kbd>L</kbd> key to toggle the Fusion diagnostics overlay.
 
-![Diagnostics overlay](diagnostics.png)
+![Diagnostics overlay](img/diagnostics.png)
 
 ## Session startup
 
