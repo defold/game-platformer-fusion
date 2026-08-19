@@ -4,55 +4,39 @@ key_trigger {
 }
 key_trigger {
   input: KEY_W
-  action: "run_forward"
+  action: "move_forward"
 }
 key_trigger {
   input: KEY_S
-  action: "run_backward"
+  action: "move_back"
 }
 key_trigger {
   input: KEY_A
-  action: "turn_left"
+  action: "move_left"
 }
 key_trigger {
   input: KEY_D
-  action: "turn_right"
+  action: "move_right"
 }
 key_trigger {
   input: KEY_UP
-  action: "run_forward"
+  action: "camera_up"
 }
 key_trigger {
   input: KEY_DOWN
-  action: "run_backward"
+  action: "camera_down"
 }
 key_trigger {
   input: KEY_LEFT
-  action: "turn_left"
+  action: "camera_left"
 }
 key_trigger {
   input: KEY_RIGHT
-  action: "turn_right"
+  action: "camera_right"
 }
 key_trigger {
   input: KEY_TAB
   action: "toggle_debug"
-}
-key_trigger {
-  input: KEY_1
-  action: "one"
-}
-key_trigger {
-  input: KEY_2
-  action: "two"
-}
-key_trigger {
-  input: KEY_3
-  action: "three"
-}
-key_trigger {
-  input: KEY_4
-  action: "four"
 }
 key_trigger {
   input: KEY_BACKSPACE
@@ -62,9 +46,85 @@ key_trigger {
   input: KEY_L
   action: "toggle_log"
 }
+key_trigger {
+  input: KEY_ESC
+  action: "release_mouse"
+}
 mouse_trigger {
   input: MOUSE_BUTTON_LEFT
   action: "touch"
+}
+mouse_trigger {
+  input: MOUSE_WHEEL_UP
+  action: "camera_zoom_in"
+}
+mouse_trigger {
+  input: MOUSE_WHEEL_DOWN
+  action: "camera_zoom_out"
+}
+gamepad_trigger {
+  input: GAMEPAD_LSTICK_LEFT
+  action: "move_left"
+}
+gamepad_trigger {
+  input: GAMEPAD_LSTICK_RIGHT
+  action: "move_right"
+}
+gamepad_trigger {
+  input: GAMEPAD_LSTICK_UP
+  action: "move_forward"
+}
+gamepad_trigger {
+  input: GAMEPAD_LSTICK_DOWN
+  action: "move_back"
+}
+gamepad_trigger {
+  input: GAMEPAD_LPAD_LEFT
+  action: "move_left"
+}
+gamepad_trigger {
+  input: GAMEPAD_LPAD_RIGHT
+  action: "move_right"
+}
+gamepad_trigger {
+  input: GAMEPAD_LPAD_UP
+  action: "move_forward"
+}
+gamepad_trigger {
+  input: GAMEPAD_LPAD_DOWN
+  action: "move_back"
+}
+gamepad_trigger {
+  input: GAMEPAD_RSTICK_LEFT
+  action: "camera_left"
+}
+gamepad_trigger {
+  input: GAMEPAD_RSTICK_RIGHT
+  action: "camera_right"
+}
+gamepad_trigger {
+  input: GAMEPAD_RSTICK_UP
+  action: "camera_up"
+}
+gamepad_trigger {
+  input: GAMEPAD_RSTICK_DOWN
+  action: "camera_down"
+}
+gamepad_trigger {
+  input: GAMEPAD_RPAD_DOWN
+  action: "jump"
+}
+gamepad_trigger {
+  input: GAMEPAD_LSHOULDER
+  action: "camera_zoom_out"
+}
+gamepad_trigger {
+  input: GAMEPAD_RSHOULDER
+  action: "camera_zoom_in"
+}
+gamepad_trigger {
+  input: GAMEPAD_DISCONNECTED
+  action: "gamepad_disconnected"
 }
 text_trigger {
   input: TEXT

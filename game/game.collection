@@ -1,5 +1,9 @@
 name: "game"
 instances {
+  id: "skybox"
+  prototype: "/game/skybox.go"
+}
+instances {
   id: "platform1"
   prototype: "/game/prefabs/platforms/platform.go"
   position {
@@ -405,6 +409,113 @@ instances {
     z: 24.66242
   }
 }
+instances {
+  id: "cloud_east"
+  prototype: "/game/prefabs/environment/cloud.go"
+  position {
+    x: 25.5
+    y: 0.5
+    z: -6.0
+  }
+  rotation {
+    y: 0.38268343
+    w: 0.9238795
+  }
+  scale3 {
+    x: 3.0
+    y: 3.0
+    z: 3.0
+  }
+}
+instances {
+  id: "cloud_far"
+  prototype: "/game/prefabs/environment/cloud.go"
+  position {
+    y: 5.0
+    z: -12.0
+  }
+  rotation {
+    y: 0.6087614
+    w: 0.7933533
+  }
+  scale3 {
+    x: 4.0
+    y: 4.0
+    z: 4.0
+  }
+}
+instances {
+  id: "cloud_high"
+  prototype: "/game/prefabs/environment/cloud.go"
+  position {
+    x: 23.5
+    y: 4.0
+    z: 22.0
+  }
+  rotation {
+    y: 0.13052619
+    w: 0.9914449
+  }
+  scale3 {
+    x: 3.6
+    y: 3.6
+    z: 3.6
+  }
+}
+instances {
+  id: "cloud_north"
+  prototype: "/game/prefabs/environment/cloud.go"
+  position {
+    x: -23.0
+    y: -0.5
+    z: -8.5
+  }
+  scale3 {
+    x: 2.8
+    y: 2.8
+    z: 2.8
+  }
+}
+instances {
+  id: "cloud_south"
+  prototype: "/game/prefabs/environment/cloud.go"
+  position {
+    x: 14.0
+    y: -1.5
+    z: -12.0
+  }
+  rotation {
+    y: -0.5
+    w: 0.8660254
+  }
+  scale3 {
+    x: 2.6
+    y: 2.6
+    z: 2.6
+  }
+}
+instances {
+  id: "cloud_west"
+  prototype: "/game/prefabs/environment/cloud.go"
+  position {
+    x: -23.0
+    y: 2.5
+    z: 11.0
+  }
+  rotation {
+    y: -0.25881904
+    w: 0.9659258
+  }
+  scale3 {
+    x: 3.5
+    y: 3.5
+    z: 3.5
+  }
+}
+instances {
+  id: "player_visual_factories"
+  prototype: "/game/prefabs/player/player_visual_factories.go"
+}
 scale_along_z: 0
 embedded_instances {
   id: "level"
@@ -464,11 +575,84 @@ embedded_instances {
   "  id: \"tier_service\"\n"
   "  component: \"/shadow_mapping/tier_service.script\"\n"
   "}\n"
+  "embedded_components {\n"
+  "  id: \"directional_light\"\n"
+  "  type: \"directional_light\"\n"
+  "  data: \"data {\\n"
+  "  struct {\\n"
+  "    fields {\\n"
+  "      key: \\\"color\\\"\\n"
+  "      value {\\n"
+  "        list {\\n"
+  "          values {\\n"
+  "            number: 1.0\\n"
+  "          }\\n"
+  "          values {\\n"
+  "            number: 0.92\\n"
+  "          }\\n"
+  "          values {\\n"
+  "            number: 0.84\\n"
+  "          }\\n"
+  "        }\\n"
+  "      }\\n"
+  "    }\\n"
+  "    fields {\\n"
+  "      key: \\\"intensity\\\"\\n"
+  "      value {\\n"
+  "        number: 0.58\\n"
+  "      }\\n"
+  "    }\\n"
+  "  }\\n"
+  "}\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"ambient_light\"\n"
+  "  type: \"ambient_light\"\n"
+  "  data: \"data {\\n"
+  "  struct {\\n"
+  "    fields {\\n"
+  "      key: \\\"color\\\"\\n"
+  "      value {\\n"
+  "        list {\\n"
+  "          values {\\n"
+  "            number: 0.78\\n"
+  "          }\\n"
+  "          values {\\n"
+  "            number: 0.82\\n"
+  "          }\\n"
+  "          values {\\n"
+  "            number: 1.0\\n"
+  "          }\\n"
+  "        }\\n"
+  "      }\\n"
+  "    }\\n"
+  "    fields {\\n"
+  "      key: \\\"intensity\\\"\\n"
+  "      value {\\n"
+  "        number: 0.8\\n"
+  "      }\\n"
+  "    }\\n"
+  "  }\\n"
+  "}\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"shadow_camera\"\n"
+  "  type: \"camera\"\n"
+  "  data: \"aspect_ratio: 1.0\\n"
+  "fov: 0.7854\\n"
+  "near_z: 5.0\\n"
+  "far_z: 35.0\\n"
+  "orthographic_projection: 1\\n"
+  "orthographic_zoom: 24.0\\n"
+  "\"\n"
+  "}\n"
   ""
   position {
-    x: -535.0
-    y: 8264.0
-    z: 5604.0
+    x: -2.0
+    y: 23.0
+    z: 24.0
   }
   rotation {
     x: -0.48434818
@@ -493,12 +677,6 @@ embedded_instances {
   "  data: \"prototype: \\\"/game/prefabs/player/player.go\\\"\\n"
   "\"\n"
   "}\n"
-  "embedded_components {\n"
-  "  id: \"coinfactory\"\n"
-  "  type: \"factory\"\n"
-  "  data: \"prototype: \\\"/game/prefabs/coin/coin.go\\\"\\n"
-  "\"\n"
-  "}\n"
   ""
 }
 embedded_instances {
@@ -514,18 +692,6 @@ embedded_instances {
   "\"\n"
   "}\n"
   "embedded_components {\n"
-  "  id: \"break\"\n"
-  "  type: \"sound\"\n"
-  "  data: \"sound: \\\"/assets/sounds/break.ogg\\\"\\n"
-  "\"\n"
-  "}\n"
-  "embedded_components {\n"
-  "  id: \"fall\"\n"
-  "  type: \"sound\"\n"
-  "  data: \"sound: \\\"/assets/sounds/fall.ogg\\\"\\n"
-  "\"\n"
-  "}\n"
-  "embedded_components {\n"
   "  id: \"jump\"\n"
   "  type: \"sound\"\n"
   "  data: \"sound: \\\"/assets/sounds/jump.ogg\\\"\\n"
@@ -537,11 +703,15 @@ embedded_instances {
   "  data: \"sound: \\\"/assets/sounds/land.ogg\\\"\\n"
   "\"\n"
   "}\n"
-  "embedded_components {\n"
-  "  id: \"walking\"\n"
-  "  type: \"sound\"\n"
-  "  data: \"sound: \\\"/assets/sounds/walking.ogg\\\"\\n"
-  "\"\n"
-  "}\n"
   ""
+}
+embedded_instances {
+  id: "clouds"
+  children: "cloud_east"
+  children: "cloud_far"
+  children: "cloud_high"
+  children: "cloud_north"
+  children: "cloud_south"
+  children: "cloud_west"
+  data: ""
 }

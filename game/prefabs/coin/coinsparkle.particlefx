@@ -4,7 +4,7 @@ emitters {
   space: EMISSION_SPACE_WORLD
   tile_source: "/assets/game.atlas"
   animation: "particle"
-  material: "/builtins/materials/particlefx.material"
+  material: "/assets/materials/particle_billboard.material"
   blend_mode: BLEND_MODE_ADD
   max_particle_count: 10
   type: EMITTER_TYPE_SPHERE
@@ -135,6 +135,12 @@ emitters {
       y: 3.368669
       t_x: 0.9999945
       t_y: 0.003318455
+    }
+  }
+  attributes {
+    name: "billboard_mode"
+    double_values {
+      v: 0.0
     }
   }
 }

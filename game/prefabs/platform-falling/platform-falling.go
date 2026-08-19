@@ -3,19 +3,9 @@ components {
   component: "/game/prefabs/platform-falling/platform-falling.script"
 }
 embedded_components {
-  id: "model"
-  type: "model"
-  data: "mesh: \"/assets/models/kenney_platformer/platform-falling.glb\"\n"
-  "name: \"{{NAME}}\"\n"
-  "materials {\n"
-  "  name: \"colormap\"\n"
-  "  material: \"/shadow_mapping/materials/mid/diffuse.material\"\n"
-  "  textures {\n"
-  "    sampler: \"tex0\"\n"
-  "    texture: \"/assets/models/kenney_platformer/Textures/colormap.png\"\n"
-  "  }\n"
-  "}\n"
-  "create_go_bones: false\n"
+  id: "visual_factory"
+  type: "factory"
+  data: "prototype: \"/game/prefabs/platform-falling/platform_falling_visual.go\"\n"
   ""
 }
 embedded_components {

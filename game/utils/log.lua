@@ -1,3 +1,4 @@
+---Small fan-out logger used by the in-game console and standard output.
 local M = {}
 
 
@@ -6,6 +7,7 @@ local _print = _G.print
 
 local buffer = {}
 
+---@param s string
 M.buffer = function(s)
 	if string.sub(s, -1) == "\n" then
 		s = string.sub(s, 1, #s - 1)
@@ -14,6 +16,7 @@ M.buffer = function(s)
 	table.remove(buffer, 100)
 end
 
+---@param s string
 M.print = function(s)
 	_print(s)
 end
@@ -21,21 +24,26 @@ end
 
 local outputs = { M.buffer, M.print }
 
+---@param s string
 local function logstring(s)
 	for i=1, #outputs do
 		outputs[i](s)
 	end
 end
 
+---@param ... fun(message: string)
 function M.init(...)
 	outputs = { ... }
 end
 
+---@param fmt any
+---@param ... any
 function M.log(fmt, ...)
 	local s = string.format(tostring(fmt), ...)
 	logstring(s)
 end
 
+---@param ... any
 _G.print = function(...)
 	local s = ""
 	local t = { ... }
@@ -45,6 +53,9 @@ _G.print = function(...)
 	logstring(s)
 end
 
+---Returns an iterator over the newest buffered messages.
+---@param n number|nil
+---@return fun(): string|nil
 function M.latest(n)
 	local i = 1
 	n = n or 20

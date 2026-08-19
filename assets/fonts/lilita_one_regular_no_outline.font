@@ -1,0 +1,5 @@
+font: "/assets/fonts/lilita_one_regular.ttf"
+material: "/builtins/fonts/font-df.material"
+size: 40
+output_format: TYPE_DISTANCE_FIELD
+characters: " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"

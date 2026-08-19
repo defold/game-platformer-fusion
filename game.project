@@ -2,6 +2,7 @@
 title = FusionPlatformer
 write_log_file = 1
 dependencies#0 = https://github.com/defold/extension-photon-fusion/archive/refs/heads/master.zip
+dependencies#1 = https://github.com/indiesoftby/defold-object-interpolation/archive/refs/tags/1.3.1.zip
 
 [bootstrap]
 main_collection = /game/lobby/lobby.collectionc
@@ -9,6 +10,9 @@ render = /shadow_mapping/render/custom.renderc
 
 [input]
 game_binding = /input/game.input_bindingc
+gamepads = /builtins/input/default.gamepadsc
+gamepad_database = /builtins/input/gamecontrollerdb.txt
+gamepad_deadzone = 0.2
 repeat_interval = 0.05
 
 [display]
@@ -16,6 +20,10 @@ width = 1000
 height = 800
 high_dpi = 1
 display_device_info = 1
+
+[engine]
+fixed_update_frequency = 60
+max_time_step = 0.05
 
 [script]
 shared_state = 1
@@ -25,9 +33,6 @@ subpixels = 1
 
 [sprite]
 subpixels = 1
-
-[windows]
-iap_provider = 
 
 [android]
 package = com.defold.examples
@@ -45,17 +50,25 @@ scale_mode = no_scale
 
 [graphics]
 texture_profiles = /all.texture_profiles
-max_characters = 16000
+max_characters = 8192
 
 [physics]
 type = 3D
-gravity_y = -40.0
+use_fixed_timestep = 1
+max_fixed_timesteps = 0
 
 [model]
 max_count = 1024
 
+[light]
+max_count = 8
+
+[object_interpolation]
+max_count = 1024
+
 [fusion]
 use_wss = 1
+
 [render]
 clear_color_red = 0.3
 clear_color_green = 0.4

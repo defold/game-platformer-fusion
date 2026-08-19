@@ -1,93 +1,128 @@
--- Collectible coin that respawns after a cooldown. Uses client-side prediction
--- for immediate visual feedback.
+-- Collectible coin that respawns after a cooldown.
+-- Uses client-side prediction for immediate visual feedback.
 
 local game_context = require("game.context")
 local messages = require("game.messages")
 local groups = require("game.groups")
+local settings = require("game.settings")
 
 local COOLDOWN_TIMER_DELAY = 6
+local COIN_ROTATION_SPEED = math.rad(55.0)
+local COIN_FLOAT_SPEED = 1.8
+local COIN_FLOAT_HEIGHT = 0.22
+local TAU = math.pi * 2.0
 
-function init(self)
-	local options = {
-		replication_mode = fusion.REPLICATION_MODE_NONE
-	}
-	fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
-	
-	fusion.subscribe_rpc(messages.RPC_COIN_COLLECTED)
+---@class CoinState
+---@field original_position vector3
+---@field float_time number
+---@field collected boolean Authority-side duplicate request guard.
+---@field visual_enabled boolean Local presentation and collision state.
 
-	self.time = 0
-	self.original_position = go.get_position()
-	self.collected = false	
+---Applies the complete offline collection flow without Fusion RPCs.
+---@param self CoinState
+local function collect_locally(self)
+	if self.collected then
+		return
+	end
+
+	self.collected = true
+	msg.post("#", messages.RPC_DISABLE)
+	msg.post(game_context.local_player, messages.RPC_COIN_COLLECTED)
+	timer.delay(COOLDOWN_TIMER_DELAY, false, function()
+		self.collected = false
+		msg.post("#", messages.RPC_ENABLE)
+	end)
 end
 
-function final(self)
-	fusion.unsubscribe_rpc(messages.RPC_COIN_COLLECTED)
+-------------------------------
+-- Defold lifecycle functions:
+-------------------------------
+
+function init(self)
+	if not settings.LOCAL_PLATFORMER then
+		local options = {
+			replication_mode = fusion.REPLICATION_MODE_NONE
+		}
+		fusion.create_map_object(game_context.map, fusion.OWNERMODE_MASTERCLIENT, options)
+	end
+
+	self.original_position = go.get_position()
+	self.float_time = math.abs(self.original_position.x * 0.21 + self.original_position.z * 0.13) % TAU
+	self.collected = false
+	self.visual_enabled = true
 end
 
 function update(self, dt)
 	local rot = go.get_rotation()
-	rot = rot * vmath.quat_rotation_y(math.rad(40) * dt)
+	rot = rot * vmath.quat_rotation_y(COIN_ROTATION_SPEED * dt)
 	go.set_rotation(rot)
 
 	local pos = vmath.vector3(self.original_position)
-	pos.y = pos.y + math.abs(math.cos(math.rad(self.time * 40))) * 0.2
+	self.float_time = self.float_time + COIN_FLOAT_SPEED * dt
+	pos.y = pos.y + math.sin(self.float_time) * COIN_FLOAT_HEIGHT
 	go.set_position(pos)
-
-	self.time = self.time + dt
 end
 
 function on_message(self, message_id, message, sender)
 	if message_id == messages.COLLISION_RESPONSE then
 		if message.other_group == groups.PLAYER then
 			if game_context.local_player == message.other_id then
-				-- send request to collect the coin to the owning client
+				if settings.LOCAL_PLATFORMER then
+					collect_locally(self)
+					return
+				end
+
+				-- Hide immediately for responsiveness. The score waits for a reply
+				-- from the authority that owns this coin object.
 				local coin_id = go.get_id()
-				--local owner_id = fusion.get_owner_id(coin_id)
 				local collector_id = fusion.get_local_player_id()
 				local target_player_id = fusion.OBJECT_OWNER_PLAYER_ID
 				local target_object_id = coin_id
 				local data = { collector_id = collector_id, coin_id = coin_id }
-				print("SENDING RPC_REQUEST_COIN_COLLECTED")
 				fusion.send_rpc(target_player_id, target_object_id, messages.RPC_REQUEST_COIN_COLLECTED, data)
 
-				-- clients without authority will predict the result to have immediate
-				-- visual feedback.
 				msg.post("#", messages.RPC_DISABLE)
 			end
 		end
 	elseif message_id == messages.RPC_REQUEST_COIN_COLLECTED then
-		-- this is received by the client which has authority, ie is the owner of
-		-- the coin, in this case the master client
+		-- Fusion delivers this object-targeted RPC to the coin authority.
 		if self.collected then
 			-- the coin was already collected by someone else
 			return
 		end
 
-		-- flag that the coin was collected and start a timer to
-		-- reactivate the coin
+		-- Lock the request before broadcasting so simultaneous collectors cannot
+		-- both receive a score confirmation.
 		self.collected = true
 		timer.delay(COOLDOWN_TIMER_DELAY, false, function()
 			self.collected = false
-			-- broadcast to the coin that it should be enabled
-			fusion.send_rpc(0, go.get_id(), messages.RPC_ENABLE)
+			-- Broadcast the respawn to this coin instance on every client.
+			fusion.send_rpc(0, go.get_id(), messages.RPC_ENABLE, {})
 		end)
 
-		-- send confirmation back to the coin that it was collected
-		fusion.send_rpc(message.data.collector_id, go.get_id(), messages.RPC_COIN_COLLECTED)
+		-- Confirm the collector, then update the coin on every client.
+		fusion.send_rpc(message.data.collector_id, go.get_id(), messages.RPC_COIN_COLLECTED, {})
 
-		-- broadcast to the coin that it should be disabled
-		fusion.send_rpc(0, go.get_id(), messages.RPC_DISABLE)
+		fusion.send_rpc(0, go.get_id(), messages.RPC_DISABLE, {})
 	elseif message_id == messages.RPC_COIN_COLLECTED then
-		-- the coin authority has confirmed that the coin was collected
-		-- play a sound and tell the player that a coin was collected
-		msg.post(game_context.sounds, messages.SOUND_COIN_COLLECTED)
+		-- The authority confirmed the request; the local player may now score it.
 		msg.post(game_context.local_player, messages.RPC_COIN_COLLECTED)
 	elseif message_id == messages.RPC_ENABLE then
+		if self.visual_enabled then
+			return
+		end
+		self.visual_enabled = true
+		particlefx.stop("#coincollect", { clear = true })
 		particlefx.play("#coinsparkle")
 		msg.post("#model", "enable")
 		msg.post("#collisionobject", "enable")
 	elseif message_id == messages.RPC_DISABLE then
+		if not self.visual_enabled then
+			return
+		end
+		self.visual_enabled = false
 		particlefx.stop("#coinsparkle")
+		particlefx.play("#coincollect")
 		msg.post("#model", "disable")
 		msg.post("#collisionobject", "disable")
 	end

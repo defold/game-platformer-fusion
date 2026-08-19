@@ -1,16 +1,34 @@
 local game_context = require("game.context")
 local messages = require("game.messages")
+local settings = require("game.settings")
+
+-------------------------------
+-- Defold lifecycle functions:
+-------------------------------
 
 function init(self)
 	game_context.sounds = msg.url()
+	if not settings.LOCAL_PLATFORMER then
+		-- A single receiver per client prevents every coin or player instance
+		-- from subscribing and playing the same broadcast more than once.
+		fusion.subscribe_rpc(messages.RPC_JUMP)
+		fusion.subscribe_rpc(messages.RPC_LAND)
+	end
+end
+
+function final(self)
+	if not settings.LOCAL_PLATFORMER then
+		fusion.unsubscribe_rpc(messages.RPC_JUMP)
+		fusion.unsubscribe_rpc(messages.RPC_LAND)
+	end
 end
 
 function on_message(self, message_id, message, sender)
 	if message_id == messages.SOUND_COIN_COLLECTED then
 		sound.play("#coin")
-	elseif message_id == messages.SOUND_JUMP then
+	elseif message_id == messages.SOUND_JUMP or message_id == messages.RPC_JUMP then
 		sound.play("#jump")
-	elseif message_id == messages.SOUND_LAND then
+	elseif message_id == messages.SOUND_LAND or message_id == messages.RPC_LAND then
 		sound.play("#land")
 	end
 end

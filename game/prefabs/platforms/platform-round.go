@@ -38,3 +38,51 @@ embedded_components {
   "}\n"
   ""
 }
+embedded_components {
+  id: "grass_left"
+  type: "model"
+  data: "mesh: \"/assets/models/kenney_platformer/grass.glb\"\n"
+  "name: \"{{NAME}}\"\n"
+  "materials {\n"
+  "  name: \"colormap\"\n"
+  "  material: \"/shadow_mapping/materials/mid/diffuse.material\"\n"
+  "  textures {\n"
+  "    sampler: \"tex0\"\n"
+  "    texture: \"/assets/models/kenney_platformer/Textures/colormap.png\"\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: -1.15
+    y: 0.5
+    z: 0.45
+  }
+  rotation {
+    y: 0.25881904
+    w: 0.9659258
+  }
+}
+embedded_components {
+  id: "grass_right"
+  type: "model"
+  data: "mesh: \"/assets/models/kenney_platformer/grass.glb\"\n"
+  "name: \"{{NAME}}\"\n"
+  "materials {\n"
+  "  name: \"colormap\"\n"
+  "  material: \"/shadow_mapping/materials/mid/diffuse.material\"\n"
+  "  textures {\n"
+  "    sampler: \"tex0\"\n"
+  "    texture: \"/assets/models/kenney_platformer/Textures/colormap.png\"\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 1.25
+    y: 0.5
+    z: -0.35
+  }
+  rotation {
+    y: -0.34202015
+    w: 0.9396926
+  }
+}

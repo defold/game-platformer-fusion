@@ -14,10 +14,6 @@ embedded_components {
   "    sampler: \"tex0\"\n"
   "    texture: \"/assets/models/kenney_platformer/Textures/colormap.png\"\n"
   "  }\n"
-  "  textures {\n"
-  "    sampler: \"tex_depth\"\n"
-  "    texture: \"/assets/models/kenney_platformer/Textures/colormap.png\"\n"
-  "  }\n"
   "}\n"
   ""
 }
