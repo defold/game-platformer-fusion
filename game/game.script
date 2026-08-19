@@ -16,7 +16,6 @@ local NO_WINNER = -1
 local function spawn_player()
 	log("spawn player")
 	local position = vmath.vector3(0, 3, 0)
-	local map = 1
 	local id
 	if settings.LOCAL_PLATFORMER then
 		id = factory.create("#playerfactory", position)
@@ -28,7 +27,7 @@ local function spawn_player()
 			},
 			replication_mode = fusion.REPLICATION_MODE_AUTO,
 		}
-		id = fusion.spawn("#playerfactory", position, nil, map, owner_mode, options)
+		id = fusion.spawn("#playerfactory", position, nil, game_context.map, owner_mode, options)
 	end
 	log("spawned player with id %s", tostring(id))
 end
@@ -41,7 +40,7 @@ end
 ---Forwards replicated winner changes to the local, message-driven GUI.
 ---@param self GameState
 local function update_winner_ui(self)
-	local winner = self.net_winner > 0 and self.net_winner or -1
+	local winner = self.net_winner > 0 and self.net_winner or NO_WINNER
 	if self.displayed_winner ~= winner then
 		self.displayed_winner = winner
 		msg.post(game_context.ui, messages.GAME_WINNER_CHANGED, { winner = winner })
