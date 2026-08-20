@@ -302,6 +302,8 @@ function M.render_shadow()
 	render.disable_material()
 	-- Animated component bounds can lag behind the skinned pose. Avoid CPU
 	-- frustum rejection here and let the shadow-camera raster pass clip it.
+	-- Skinned components own their depth-only material so Defold can bind the
+	-- animation pose cache while creating their render objects.
 	render.draw(M.shadow_model_skinned_pred, M.shadow_depth_skinned_draw_options)
 
 	render.set_polygon_offset(0.0, 0.0)
