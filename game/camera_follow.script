@@ -32,6 +32,8 @@ local ACTION_TOUCH = hash("touch")
 
 ---@class CameraFollowState
 ---@field target url|nil Interpolated visual followed by the camera operator.
+---@field current_yaw number Smoothed yaw; kept here because euler read back from the quaternion wraps at ±180.
+---@field current_pitch number Smoothed pitch.
 ---@field left number
 ---@field right number
 ---@field up number
@@ -97,6 +99,11 @@ function init(self)
 	self.target_yaw = go.get(".", EULER_Y)
 	self.target_pitch = go.get(CAMERA_OFFSET, EULER_X)
 	self.target_distance = go.get_position(CAMERA).z
+	-- Smoothed angles live here, never read back via go.get(): euler derived
+	-- from the quaternion is canonicalized (wrapped to ±180), which made the
+	-- camera spin the long way around whenever the yaw crossed ±180.
+	self.current_yaw = self.target_yaw
+	self.current_pitch = self.target_pitch
 end
 
 function late_update(self, dt)
@@ -121,14 +128,11 @@ function late_update(self, dt)
 	-- Smooth rotation
 	local rotation_alpha = 1.0 - math.exp(-self.rotation_smooth_speed * dt)
 
-	local current_yaw = go.get(".", EULER_Y)
-	local current_pitch = go.get(CAMERA_OFFSET, EULER_X)
+	self.current_yaw = self.current_yaw + (self.target_yaw - self.current_yaw) * rotation_alpha
+	self.current_pitch = self.current_pitch + (self.target_pitch - self.current_pitch) * rotation_alpha
 
-	current_yaw = current_yaw + (self.target_yaw - current_yaw) * rotation_alpha
-	current_pitch = current_pitch + (self.target_pitch - current_pitch) * rotation_alpha
-
-	go.set(".", EULER_Y, current_yaw)
-	go.set(CAMERA_OFFSET, EULER_X, current_pitch)
+	go.set(".", EULER_Y, self.current_yaw)
+	go.set(CAMERA_OFFSET, EULER_X, self.current_pitch)
 
 	-- Smooth zoom
 	local camera_position = go.get_position(CAMERA)
