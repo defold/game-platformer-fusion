@@ -14,7 +14,7 @@ Online play requires a Photon Fusion App ID.
 
 1. Create an [App ID in the Photon Fusion Dashboard](https://doc.photonengine.com/fusion/v2/getting-started/appid-instructions).
 
-2. In Defold, open `game.project` and go to the `Runtime` -> `Fusion` tab (or search for "fusion").
+2. In Defold, open `game.project` and go to the `Runtime` -> `Fusion` tab (or search for "fusion"). I requires Defold 1.14.0 or newer.
 
 3. Enter the App ID from the Photon dashboard in the `App Id` field.
 
